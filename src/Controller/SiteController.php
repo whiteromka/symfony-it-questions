@@ -10,12 +10,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class SiteController extends AbstractController
 {
     #[Route('/', name: 'site_index', methods: ['GET'])]
-    public function index(QuestionService $randomQuestionService): Response
+    public function index(): Response
     {
-        $question = $randomQuestionService->getRandomQuestion();
-        dd($question);
-        die;
-
         return $this->render('site/index.html.twig', [
             'data' => 'some data',
         ]);

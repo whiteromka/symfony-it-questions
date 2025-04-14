@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Question;
 use App\Form\QuestionType;
 use App\Repository\QuestionRepository;
+use App\Service\QuestionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +15,18 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/question')]
 final class QuestionController extends AbstractController
 {
+    #[Route('/random', name: 'question_random', methods: ['GET'])]
+    public function random(QuestionService $randomQuestionService): Response
+    {
+        $question = $randomQuestionService->getRandomQuestion();
+        if (!is_null($question)) {
+
+        }
+        return $this->render('question/random.html.twig', [
+            'question' => $question,
+        ]);
+    }
+
     #[Route('/', name: 'question_index', methods: ['GET'])]
     public function index(QuestionRepository $questionRepository): Response
     {
