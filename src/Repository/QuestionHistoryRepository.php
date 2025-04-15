@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Question;
 use App\Entity\QuestionHistory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -14,6 +15,15 @@ class QuestionHistoryRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, QuestionHistory::class);
+    }
+
+    public function add(int $questionId): void
+    {
+        $question = $this->getEntityManager()->getReference(Question::class, $questionId);
+        $history = new QuestionHistory();
+        $history->setQuestion($question);
+        $this->getEntityManager()->persist($history);
+        $this->getEntityManager()->flush();
     }
 
     //    /**

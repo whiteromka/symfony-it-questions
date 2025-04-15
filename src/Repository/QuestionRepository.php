@@ -46,4 +46,12 @@ class QuestionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function findAllOrderedById(): array
+    {
+        return $this->createQueryBuilder('q')
+            ->orderBy('q.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

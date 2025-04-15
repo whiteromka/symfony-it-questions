@@ -20,7 +20,7 @@ final class QuestionController extends AbstractController
     {
         $question = $randomQuestionService->getRandomQuestion();
         if (!is_null($question)) {
-
+            $randomQuestionService->addQuestionHistory($question->getId());
         }
         return $this->render('question/random.html.twig', [
             'question' => $question,
@@ -31,7 +31,7 @@ final class QuestionController extends AbstractController
     public function index(QuestionRepository $questionRepository): Response
     {
         return $this->render('question/index.html.twig', [
-            'questions' => $questionRepository->findAll(),
+            'questions' => $questionRepository->findAllOrderedById(),
         ]);
     }
 

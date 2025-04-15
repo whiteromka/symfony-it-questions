@@ -3,10 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\QuestionHistoryRepository;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: QuestionHistoryRepository::class)]
 class QuestionHistory
 {
@@ -42,13 +44,19 @@ class QuestionHistory
 
     public function getLastTimeShowed(): ?DateTimeInterface
     {
-        return $this->last_time_showed;
+        return $this->lastTimeShowed;
     }
 
-    public function setLastTimeShowed(DateTimeInterface $last_time_showed): static
+    public function setLastTimeShowed(DateTimeInterface $lastTimeShowed): static
     {
-        $this->last_time_showed = $last_time_showed;
+        $this->lastTimeShowed = $lastTimeShowed;
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function setLastTimeShowedValue(): void
+    {
+        $this->lastTimeShowed = new DateTimeImmutable();
     }
 }

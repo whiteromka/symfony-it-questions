@@ -21,8 +21,7 @@ class QuestionType extends AbstractType
                 'label' => 'Текст',
                 'required' => false,
                 'attr' => [
-                    'data-controller' => 'html-editor',
-                    'rows' => 12
+                    'data-controller' => 'html-editor'
                 ],
             ])
             ->add('difficulty', null, ['label' => 'Сложность'])
