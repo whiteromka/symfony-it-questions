@@ -1,16 +1,18 @@
 {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': true}}) }}
 
-    {# Поле title #}
+{# Поле title #}
 <div class="mb-3">
     {{ form_label(form.title, 'Заголовок вопроса', {'label_attr': {'class': 'form-label'}}) }}
     {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
     {{ form_errors(form.title) }}
 </div>
 
-{# Поле text с возможностью HTML #}
+{# Поле text с возможностью HTML. Тут HTML редактор #}
 <div class="mb-3">
     {{ form_label(form.text, 'Текст вопроса', {'label_attr': {'class': 'form-label'}}) }}
-    {{ form_widget(form.text, {'attr': {'class': 'form-control', 'rows': 18}}) }}
+    {{ form_widget(form.text, {'attr': {
+        'class': 'form-control summernote-editor',
+    }}) }}
     <div class="form-text">Можно использовать HTML-разметку</div>
     {{ form_errors(form.text) }}
 </div>
