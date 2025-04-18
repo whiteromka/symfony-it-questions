@@ -3,15 +3,17 @@ services:
     build: .
     volumes:
       - ./:/var/www
-      - ./var/cache:/var/www/var/cache:cached  # Монтирование кеша
-      - ./var/log:/var/www/var/log:cached      # И логов
+      - ./var/cache:/var/www/var/cache:cached
+      - ./var/log:/var/www/var/log:cached
     environment:
       - XDEBUG_MODE=develop,debug
       - XDEBUG_CONFIG=client_host=host.docker.internal
       - APP_ENV=dev
-    user: "${UID:-1000}:${GID:-1000}" # (совместимость с хостовой системой)
+      - RABBITMQ_HOST=rabbitmq
+    user: "${UID:-1000}:${GID:-1000}"
     depends_on:
       - db
+      - rabbitmq
 
   nginx:
     image: nginx:alpine
@@ -37,5 +39,17 @@ services:
     ports:
       - "5432:5432"
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"    # Порт для AMQP (подключение PHP)
+      - "15672:15672"  # Порт веб-интерфейса
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
 volumes:
   postgres_data:
+  rabbitmq_data:

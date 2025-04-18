@@ -3,8 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Question;
-use App\Enum\QuestionCategory;
+use App\Entity\QuestionCategory;
 use App\Enum\QuestionStatus;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -25,10 +26,11 @@ class QuestionType extends AbstractType
                 ],
             ])
             ->add('difficulty', null, ['label' => 'Сложность'])
-            ->add('category', EnumType::class, [
+            ->add('questionCategory', EntityType::class, [
                 'label' => 'Категория',
                 'class' => QuestionCategory::class,
-                'choice_label' => fn(QuestionCategory $category) => $category->getLabel()
+                'choice_label' => 'name',
+                'placeholder' => 'Выберите категорию'
             ])
             ->add('status', EnumType::class, [
                 'label' => 'Статус',

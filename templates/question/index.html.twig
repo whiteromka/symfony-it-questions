@@ -25,7 +25,7 @@
                 <td>{{ question.title }}</td>
                 <td> {{ question.text|striptags|slice(0, 120) }} ...</td>
                 <td>{{ question.difficulty }}</td>
-                <td>{{ question.category.value }}</td>
+                <td>{{ question.questionCategory.name }}</td>
                 <td>{{ question.status.value }}</td>
                 <td>{{ question.createdAt ? question.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>

@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Enum\QuestionCategory;
 use App\Enum\QuestionStatus;
 use App\Repository\QuestionRepository;
 use DateTimeImmutable;
@@ -27,13 +26,9 @@ class Question
     #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['default' => 5])]
     private int $difficulty = 5;
 
-    #[ORM\Column(
-        type: Types::STRING,
-        nullable: false,
-        enumType: QuestionCategory::class,
-        options: ['default' => QuestionCategory::COMMON->value]
-    )]
-    private QuestionCategory $category = QuestionCategory::COMMON;
+    #[ORM\ManyToOne(targetEntity: QuestionCategory::class)]
+    #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id')]
+    private ?QuestionCategory $questionCategory = null;
 
     #[ORM\Column(
         type: Types::INTEGER,
@@ -125,6 +120,18 @@ class Question
     public function setStatus(QuestionStatus $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getQuestionCategory(): ?QuestionCategory
+    {
+        return $this->questionCategory;
+    }
+
+    public function setQuestionCategory(?QuestionCategory $questionCategory): static
+    {
+        $this->questionCategory = $questionCategory;
 
         return $this;
     }
