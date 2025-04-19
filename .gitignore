@@ -10,6 +10,8 @@
 /var/
 /vendor/
 /helpers/
+.idea
+/.idea
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
