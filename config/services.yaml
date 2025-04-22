@@ -22,3 +22,16 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Validator\ContainsCategoryIdValidator:
+        arguments:
+            $questionCategoryRepository: '@App\Repository\QuestionCategoryRepository'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'app.contains_category_id' }
+
+#    App\Resolver\DtoValueResolver:
+#        arguments:
+#            $serializer: '@serializer'
+#            $validator: '@validator'
+#        tags:
+#            - { name: 'controller.argument_value_resolver' }

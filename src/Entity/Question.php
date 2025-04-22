@@ -18,10 +18,10 @@ class Question
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $title = null;
+    private string $title;
 
     #[ORM\Column(type: Types::TEXT, nullable: true, options: ['collation' => 'utf8mb4_unicode_ci'])]
-    private ?string $text = null;
+    private string $text;
 
     #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['default' => 5])]
     private int $difficulty = 5;
@@ -96,18 +96,6 @@ class Question
     public function setDifficulty(int $difficulty): static
     {
         $this->difficulty = $difficulty;
-
-        return $this;
-    }
-
-    public function getCategory(): QuestionCategory
-    {
-        return $this->category;
-    }
-
-    public function setCategory(QuestionCategory $category): static
-    {
-        $this->category = $category;
 
         return $this;
     }

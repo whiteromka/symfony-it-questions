@@ -35,7 +35,7 @@ class QuestionType extends AbstractType
             ->add('status', EnumType::class, [
                 'label' => 'Статус',
                 'class' => QuestionStatus::class,
-                'choice_label' => fn(QuestionStatus $status) => $status->getLabel()
+                'choice_label' => fn(QuestionStatus $status) => $status->getValue()
             ])
             ->add('createdAt', null, [
                 'label' => 'Создано',
