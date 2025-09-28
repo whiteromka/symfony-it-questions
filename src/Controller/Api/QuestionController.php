@@ -2,14 +2,13 @@
 
 namespace App\Controller\Api;
 
+use Exception;
 use App\Dto\QuestionRequestDto;
 use App\Service\QuestionService;
-use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
-
 
 #[Route('/api/question')]
 class QuestionController extends AbstractController
@@ -22,7 +21,10 @@ class QuestionController extends AbstractController
     {
         try {
             $questionService->createQuestion($questionRequestDto);
-            return $this->json(['success' => true]);
+            return $this->json([
+                    'success' => true,
+                    'error' => false
+                ]);
         } catch (Exception $exception) {
             return $this->json([
                 'success' => false,

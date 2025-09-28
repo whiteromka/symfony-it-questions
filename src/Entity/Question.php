@@ -7,6 +7,7 @@ use App\Repository\QuestionRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: QuestionRepository::class)]
@@ -18,7 +19,14 @@ class Question
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private string $title;
+    #[Assert\NotBlank(message: 'Заголовок не может быть пустым')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Заголовок должен быть длиннее {{ limit }} символов',
+        maxMessage: 'Заголовок не может быть короче {{ limit }} символов'
+    )]
+    private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true, options: ['collation' => 'utf8mb4_unicode_ci'])]
     private string $text;

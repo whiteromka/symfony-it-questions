@@ -1,8 +1,11 @@
 {% extends 'layouts/layout.html.twig' %}
+
 {% block title %}New Question{% endblock %}
 
 {% block body %}
-    <h1>Создание нового вопроса</h1>
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">Создание нового вопроса</h1>
 
-    {{ include('question/_form.html.twig') }}
+        {{ include('question/_form.html.twig') }}
+    </div>
 {% endblock %}

@@ -3,17 +3,24 @@
 {# Поле title #}
 <div class="mb-3">
     {{ form_label(form.title, 'Заголовок вопроса', {'label_attr': {'class': 'form-label'}}) }}
-    {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+    {{ form_widget(form.title, {'attr': {
+        'class': 'form-control',
+        'required': true
+    }}) }}
+    <div class="invalid-feedback">
+        Пожалуйста, заполните заголовок вопроса.
+    </div>
     {{ form_errors(form.title) }}
 </div>
 
-{# Поле text с возможностью HTML. Тут HTML редактор #}
+{# Поле text с Summernote #}
 <div class="mb-3">
     {{ form_label(form.text, 'Текст вопроса', {'label_attr': {'class': 'form-label'}}) }}
     {{ form_widget(form.text, {'attr': {
-        'class': 'form-control summernote-editor',
+        'class': 'form-control summernote-advanced',
+        'rows': 10
     }}) }}
-    <div class="form-text">Можно использовать HTML-разметку</div>
+    <div class="form-text">Используйте панель инструментов для форматирования текста</div>
     {{ form_errors(form.text) }}
 </div>
 
