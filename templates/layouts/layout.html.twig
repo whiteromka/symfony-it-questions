@@ -109,31 +109,10 @@
             });
         }
 
-        // Расширенная инициализация для элементов с классом summernote-advanced
-        if ($('.summernote-advanced').length) {
-            $('.summernote-advanced').summernote({
-                height: 300,
-                lang: 'ru-RU',
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['fontname', ['fontname']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture', 'video']],
-                    ['view', ['fullscreen', 'codeview', 'help']]
-                ],
-                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana']
-            });
-        }
-
         // Обработка отправки форм с Summernote
         $('form').on('submit', function() {
-            $('.summernote-basic, .summernote-advanced').each(function() {
-                var summernoteContent = $(this).summernote('code');
-                $(this).val(summernoteContent);
-            });
+            let editor = $('.summernote-basic');
+            editor.val(editor.summernote('code'));
         });
     }
 

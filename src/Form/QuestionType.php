@@ -30,7 +30,7 @@ class QuestionType extends AbstractType
                 'label' => 'Текст',
                 'required' => false,
                 'attr' => [
-                    'class' => 'form-control summernote-advanced',
+                    'class' => 'form-control summernote-basic',
                     'rows' => 10
                 ],
             ])
