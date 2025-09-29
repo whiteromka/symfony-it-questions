@@ -81,14 +81,17 @@ final class QuestionController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'question_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'question_delete', methods: ['POST', 'GET'])]
     public function delete(Request $request, Question $question, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$question->getId(), $request->getPayload()->getString('_token'))) {
+//        if ($this->isCsrfTokenValid('delete'.$question->getId(), $request->getPayload()->getString('_token'))) {
+//            $entityManager->remove($question);
+//            $entityManager->flush();
+//        }
+        if ($question) {
             $entityManager->remove($question);
             $entityManager->flush();
         }
-
         return $this->redirectToRoute('question_index', [], Response::HTTP_SEE_OTHER);
     }
 }

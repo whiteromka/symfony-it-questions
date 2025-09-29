@@ -12,24 +12,22 @@
     {% block stylesheets %}
         <link href="{{ asset('css/someCss.css') }}" rel="stylesheet" />
         <link href="{{ asset('css/styles.css') }}" rel="stylesheet" />
-        {# Summernote JS редактор текста #}
+        {# Стили Summernote редактора #}
         <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
     {% endblock %}
     {% block additional_styles %}{% endblock %}
 
-    <!-- JS -->
-    {% block importmap %}{{ importmap('app') }}{% endblock %}
     {% block javascripts %}
-        <script src="{{ asset('js/fontawesome.js') }}" crossorigin="anonymous"></script>
-
-        {# jQuery - ОБЯЗАТЕЛЬНО для Summernote #}
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="{{ asset('js/fontawesome.js') }}" crossorigin="anonymous"></script>
+    {% endblock %}
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% block additional_scripts %}
         {# Summernote JS #}
         <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
         {# Русская локализация Summernote #}
         <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ru-RU.min.js"></script>
     {% endblock %}
-    {% block additional_scripts %}{% endblock %}
 
 </head>
 <body class="sb-nav-fixed">
@@ -89,9 +87,13 @@
 <!-- бургер меню логика -->
 <script src="{{ asset('js/scripts.js') }}"></script>
 
-{# Базовая инициализация Summernote - будет работать на всех страницах #}
+{# Базовая инициализация Summernote #}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    // Убедимся, что jQuery доступен глобально
+    window.jQuery = window.$ = jQuery;
+
+    function initializeSummernote() {
+
         // Базовая инициализация для всех элементов с классом summernote-basic
         if ($('.summernote-basic').length) {
             $('.summernote-basic').summernote({
@@ -128,13 +130,21 @@
 
         // Обработка отправки форм с Summernote
         $('form').on('submit', function() {
-            // Конвертируем Summernote контент обратно в текстовые поля
             $('.summernote-basic, .summernote-advanced').each(function() {
                 var summernoteContent = $(this).summernote('code');
                 $(this).val(summernoteContent);
             });
         });
-    });
+    }
+
+    // Ждем полной загрузки страницы
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initializeSummernote, 50);
+        });
+    } else {
+        setTimeout(initializeSummernote, 50);
+    }
 </script>
 
 </body>
