@@ -23,7 +23,7 @@
             <tr>
                 <td>{{ question.id }}</td>
                 <td>{{ question.title }}</td>
-                <td> {{ question.text|striptags|slice(0, 120) }} ...</td>
+                <td>{{ question.text|striptags|slice(0, 120) }} ...</td>
                 <td>{{ question.difficulty }}</td>
                 <td>{{ question.questionCategory.name }}</td>
                 <td>{{ question.status.value }}</td>

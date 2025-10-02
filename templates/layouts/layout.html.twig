@@ -87,44 +87,5 @@
 <!-- бургер меню логика -->
 <script src="{{ asset('js/scripts.js') }}"></script>
 
-{# Базовая инициализация Summernote #}
-<script>
-    // Убедимся, что jQuery доступен глобально
-    window.jQuery = window.$ = jQuery;
-
-    function initializeSummernote() {
-
-        // Базовая инициализация для всех элементов с классом summernote-basic
-        if ($('.summernote-basic').length) {
-            $('.summernote-basic').summernote({
-                height: 200,
-                lang: 'ru-RU',
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['font', ['strikethrough']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['insert', ['link']],
-                    ['view', ['fullscreen', 'codeview']]
-                ]
-            });
-        }
-
-        // Обработка отправки форм с Summernote
-        $('form').on('submit', function() {
-            let editor = $('.summernote-basic');
-            editor.val(editor.summernote('code'));
-        });
-    }
-
-    // Ждем полной загрузки страницы
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(initializeSummernote, 50);
-        });
-    } else {
-        setTimeout(initializeSummernote, 50);
-    }
-</script>
-
 </body>
 </html>
