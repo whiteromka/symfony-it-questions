@@ -1,26 +1,16 @@
-/*!
-    * Start Bootstrap - SB Admin v7.0.7 (https://startbootstrap.com/template/sb-admin)
-    * Copyright 2013-2023 Start Bootstrap
-    * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-sb-admin/blob/master/LICENSE)
-    */
-    // 
-// Scripts
-// 
+//  Кнопка бургер меню. Разворачивает\сворачивает сайт
+$(document).ready(function() {
+    const sidebarToggle = $('#sidebarToggle');
+    if (sidebarToggle.length > 0) {
 
-window.addEventListener('DOMContentLoaded', event => {
+        if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
+            $('body').addClass('sb-sidenav-toggled');
+        }
 
-    // Toggle the side navigation
-    const sidebarToggle = document.body.querySelector('#sidebarToggle');
-    if (sidebarToggle) {
-        // Uncomment Below to persist sidebar toggle between refreshes
-        // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-        //     document.body.classList.toggle('sb-sidenav-toggled');
-        // }
-        sidebarToggle.addEventListener('click', event => {
+        sidebarToggle.on('click', function(event) {
             event.preventDefault();
-            document.body.classList.toggle('sb-sidenav-toggled');
-            localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
+            $('body').toggleClass('sb-sidenav-toggled');
+            localStorage.setItem('sb|sidebar-toggle', $('body').hasClass('sb-sidenav-toggled'));
         });
     }
-
 });
