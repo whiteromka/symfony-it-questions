@@ -2,10 +2,9 @@
 
 namespace App\Service;
 
-use App\Dto\QuestionRequestDto;
+use App\Dto\Input\QuestionRequestDto;
 use App\Entity\Question;
 use App\Enum\QuestionStatus;
-use App\Repository\QuestionCategoryRepository;
 use App\Repository\QuestionHistoryRepository;
 use App\Repository\QuestionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,29 +14,35 @@ class QuestionService
 {
     public function __construct(
         private readonly QuestionRepository $questionRepository,
-        private readonly QuestionCategoryRepository $questionCategoryRepository,
+        private readonly QuestionCategoryService $questionCategoryService,
         private readonly QuestionHistoryRepository $questionHistoryRepository,
         private readonly EntityManagerInterface $entityManager
     )
     {
     }
 
+    /**
+     * Получить рандомный вопрос
+     */
     public function getRandomQuestion(): ?Question
     {
         return $this->questionRepository->getRandomQuestion();
     }
 
-    public function addQuestionHistory(int $questionId): void
+    /**
+     * Создать запись в истории вопросов
+     */
+    public function createQuestionHistory(int $questionId): void
     {
-        $this->questionHistoryRepository->add($questionId);
+        $this->questionHistoryRepository->create($questionId);
     }
 
-    public function createQuestion(QuestionRequestDto $questionDto): void
+    /**
+     * @throws Exception
+     */
+    public function createQuestion(QuestionRequestDto $questionDto): ?Question
     {
-        $category = $this->questionCategoryRepository->find($questionDto->categoryId);
-        if (!$category) {
-            throw new Exception("Нет такой категории");
-        }
+        $category = $this->questionCategoryService->getQuestionCategoryOrFail($questionDto->categoryId);
 
         $question = new Question();
         $question->setTitle($questionDto->title)
@@ -48,5 +53,7 @@ class QuestionService
 
         $this->entityManager->persist($question);
         $this->entityManager->flush();
+
+        return $question;
     }
 }

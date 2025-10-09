@@ -20,7 +20,7 @@ final class QuestionController extends AbstractController
     {
         $question = $randomQuestionService->getRandomQuestion();
         if (!is_null($question)) {
-            $randomQuestionService->addQuestionHistory($question->getId());
+            $randomQuestionService->createQuestionHistory($question->getId());
         }
         return $this->render('question/random.html.twig', [
             'question' => $question,

@@ -16,6 +16,9 @@ class QuestionRepository extends ServiceEntityRepository
         parent::__construct($registry, Question::class);
     }
 
+    /**
+     * Получить рандомный вопрос
+     */
     public function getRandomQuestion(): ?Question
     {
         $ids = $this->getAllIds();
@@ -28,6 +31,8 @@ class QuestionRepository extends ServiceEntityRepository
     }
 
     /**
+     * Получить IDs всех вопросов
+     *
      * @return array<int> Массив всех ID вопросов
      */
     public function getAllIds(): array
@@ -38,6 +43,12 @@ class QuestionRepository extends ServiceEntityRepository
             ->getSingleColumnResult();
     }
 
+    /**
+     * Получить вопрос по ID
+     *
+     * @param int $id
+     * @return Question|Null
+     */
     public function getQuestionById(int $id): ?Question
     {
         return $this->createQueryBuilder('q')
@@ -47,6 +58,11 @@ class QuestionRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * Получить список вопросов отсортированных по ID
+     *
+     * @return array
+     */
     public function findAllOrderedById(): array
     {
         return $this->createQueryBuilder('q')

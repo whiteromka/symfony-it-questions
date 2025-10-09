@@ -17,13 +17,19 @@ class QuestionHistoryRepository extends ServiceEntityRepository
         parent::__construct($registry, QuestionHistory::class);
     }
 
-    public function add(int $questionId): void
+    /**
+     * Создать запись в истории вопросов
+     */
+    public function create(int $questionId): ?QuestionHistory
     {
         $question = $this->getEntityManager()->getReference(Question::class, $questionId);
-        $history = new QuestionHistory();
-        $history->setQuestion($question);
-        $this->getEntityManager()->persist($history);
+
+        $questionHistory = new QuestionHistory();
+        $questionHistory->setQuestion($question);
+        $this->getEntityManager()->persist($questionHistory);
         $this->getEntityManager()->flush();
+
+        return $questionHistory;
     }
 
     //    /**
