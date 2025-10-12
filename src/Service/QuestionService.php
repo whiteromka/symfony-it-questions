@@ -22,6 +22,14 @@ class QuestionService
     }
 
     /**
+     * Получить вопрос
+     */
+    public function getQuestion(int $id): ?Question
+    {
+        return $this->questionRepository->find($id);
+    }
+
+    /**
      * Получить рандомный вопрос
      */
     public function getRandomQuestion(): ?Question
