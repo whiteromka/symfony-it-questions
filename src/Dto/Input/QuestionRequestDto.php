@@ -9,7 +9,7 @@ class QuestionRequestDto
 {
     private const array STATUS_CHOICES = [0, 1];
 
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'Заголовок не может быть пустым')]
     #[Assert\Length(max: 255)]
     public string $title;
 

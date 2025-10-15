@@ -18,8 +18,6 @@ class Question
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Заголовок не может быть пустым')]
     #[Assert\Length(
         min: 3,
         max: 255,
@@ -34,7 +32,7 @@ class Question
     #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['default' => 5])]
     private int $difficulty = 5;
 
-    #[ORM\ManyToOne(targetEntity: QuestionCategory::class)]
+    #[ORM\ManyToOne(targetEntity: QuestionCategory::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id')]
     private ?QuestionCategory $questionCategory = null;
 

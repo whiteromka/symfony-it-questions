@@ -30,6 +30,14 @@ class QuestionService
     }
 
     /**
+     * Получить все вопросы
+     */
+    public function getAllQuestions(): array
+    {
+        return $this->questionRepository->findAll();
+    }
+
+    /**
      * Получить рандомный вопрос
      */
     public function getRandomQuestion(): ?Question

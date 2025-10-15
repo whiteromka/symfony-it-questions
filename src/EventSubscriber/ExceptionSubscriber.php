@@ -56,14 +56,17 @@ class ExceptionSubscriber implements EventSubscriberInterface
             }
             // (4XX, 5XX и т.д.), которые НЕ связаны с валидацией
             else {
-                $errors['message'] = $exception->getMessage();
+                $baseError = '';
+                if ($this->isError4XX($statusCode)) {
+                    $baseError = "Ошибка  $statusCode : ";
+                } else if ($this->isError5XX($statusCode)) {
+                    $baseError = "Ошибка сервера  $statusCode : ";
+                }
+                $errors['message'] = $baseError . $exception->getMessage();
             }
         } else {
             // Внутренняя ошибка сервера
-            $errors['message'] = 'Internal server error';
-            if ($_SERVER['APP_ENV'] === 'dev') {
-                $errors['debug'] = $exception->getMessage();
-            }
+            $errors['message'] = ' Внутренняя ошибка сервера: ' . $exception->getMessage();;
         }
 
         return new JsonResponse([
@@ -71,5 +74,15 @@ class ExceptionSubscriber implements EventSubscriberInterface
             'errors' => $errors,
             'data' => null,
         ], $statusCode);
+    }
+
+    private function isError4XX(string $statusCode): bool
+    {
+        return ($statusCode && ($statusCode)[0] == 4);
+    }
+
+    private function isError5XX(string $statusCode): bool
+    {
+        return ($statusCode && ($statusCode)[0] == 5);
     }
 }
