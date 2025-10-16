@@ -3,24 +3,28 @@
 {% block title %}Question index{% endblock %}
 
 {% block body %}
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Dashboard</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item active">Dashboard</li>
-    </ol>
-
-    <div class="row">
-        <div class="col-xl-8 col-md-8">
-            <div class="card  mb-4">
-                <div class="card-body">
-                    <h4>  {{ question.title }} </h4>
-                    <hr>
-                    <div>
-                        {{ question.text|raw }}
+    <div class="container-fluid">
+        <h1>Случайный вопрос</h1>
+        <div class="row">
+            <div class="col-xl-8 col-md-8">
+                <div class="card_ mb-4">
+                    <div class="card-body">
+                        {% if question is defined and question is not null and question.title is not empty %}
+                            <h4>{{ question.title }}</h4>
+                            <hr>
+                            <div>
+                                {{ question.text|raw }}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <h5>Вопросов пока нет</h5>
+                                <p class="text-muted">Здесь будут отображаться вопросы, когда они появятся</p>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
 {% endblock %}

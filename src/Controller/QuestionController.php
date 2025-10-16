@@ -30,6 +30,21 @@ final class QuestionController extends AbstractController
     #[Route('/', name: 'question_index', methods: ['GET'])]
     public function index(QuestionRepository $questionRepository): Response
     {
+
+        // Получить текущего пользователя
+        // $user = $this->getUser();
+        // Проверить роль
+        // if (!$this->isGranted('ROLE_ADMIN')) {
+        //    throw $this->createAccessDeniedException();
+        // }
+        // Или через аннотации
+        // #[IsGranted('ROLE_ADMIN')]
+        // $user->setPassword(
+        //    $passwordHasher->hashPassword($user, 'plain_password')
+        // );
+
+
+
         return $this->render('question/index.html.twig', [
             'questions' => $questionRepository->findAllOrderedById(),
         ]);
