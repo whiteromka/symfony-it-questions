@@ -10,27 +10,24 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250417202519 extends AbstractMigration
+final class Version20251016132201 extends AbstractMigration
 {
+    public function getDescription(): string
+    {
+        return '';
+    }
 
     public function up(Schema $schema): void
     {
         $this->addSql(<<<'SQL'
-            ALTER TABLE question
-                ADD CONSTRAINT fk_question__category_id
-                FOREIGN KEY (category_id)
-                REFERENCES question_category(id)
-                ON DELETE CASCADE
-                ON UPDATE CASCADE;
+            ALTER TABLE question ADD title VARCHAR(255) DEFAULT NULL
         SQL);
     }
 
     public function down(Schema $schema): void
     {
         $this->addSql(<<<'SQL'
-            ALTER TABLE question
-                DROP CONSTRAINT fk_question__category_id;
+            ALTER TABLE question DROP title
         SQL);
-
     }
 }

@@ -24,24 +24,12 @@ class QuestionController extends BaseController
     public function create(#[MapRequestPayload] QuestionRequestDto $questionRequestDto): JsonResponse
     {
         $question = $this->questionService->createQuestion($questionRequestDto);
-        $data = $this->serializeAndToArray($question);
+        $data = $this->entityToArray($question);
         return $this->setJsonResponse(true, [], $data, 201);
     }
 
-    #[Route(path: '/get/{id}', name: 'api_question_get', methods: ['GET'], format: 'json')]
-    public function get(int $id): JsonResponse
-    {
-        $question = $this->questionService->getQuestion($id);
-        if (!$question) {
-            return $this->setJsonResponse(false, ['Вопрос не найден'], [], 404);
-        }
-
-        $data = $this->serializeAndToArray($question);
-        return $this->setJsonResponse(true, [], $data);
-    }
-
-    #[Route('/get2/{id}', name: 'api_question_show', methods: ['GET'])]
-    public function show(Question $question = null): JsonResponse
+    #[Route('/get/{id}', name: 'api_question_get', methods: ['GET'], format: 'json')]
+    public function get(Question $question = null): JsonResponse
     {
         if (!$question) {
             return $this->setJsonResponse(false, ['Вопрос не найден'], [], 404);

@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -14,6 +16,7 @@ class User implements UserInterface
 {
     public function __construct() {
         $this->createdAt = new DateTimeImmutable();
+        $this->questions = new ArrayCollection();
     }
 
     #[ORM\Id]
@@ -44,6 +47,12 @@ class User implements UserInterface
 
     #[ORM\Column(name: 'created_at', nullable: true)]
     private ?DateTimeImmutable $createdAt = null;
+
+    /**
+     * @var Collection<int, Question>
+     */
+    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'author')]
+    private Collection $questions;
 
     public function getId(): ?int
     {
@@ -137,5 +146,35 @@ class User implements UserInterface
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
+    }
+
+    /**
+     * @return Collection<int, Question>
+     */
+    public function getQuestions(): Collection
+    {
+        return $this->questions;
+    }
+
+    public function addQuestion(Question $question): static
+    {
+        if (!$this->questions->contains($question)) {
+            $this->questions->add($question);
+            $question->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuestion(Question $question): static
+    {
+        if ($this->questions->removeElement($question)) {
+            // set the owning side to null (unless already changed)
+            if ($question->getAuthor() === $this) {
+                $question->setAuthor(null);
+            }
+        }
+
+        return $this;
     }
 }

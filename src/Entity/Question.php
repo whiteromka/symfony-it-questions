@@ -18,15 +18,10 @@ class Question
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Assert\Length(
-        min: 3,
-        max: 255,
-        minMessage: 'Заголовок должен быть длиннее {{ limit }} символов',
-        maxMessage: 'Заголовок не может быть короче {{ limit }} символов'
-    )]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['collation' => 'utf8mb4_unicode_ci'])]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private string $text;
 
     #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['default' => 5])]
@@ -35,6 +30,10 @@ class Question
     #[ORM\ManyToOne(targetEntity: QuestionCategory::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id')]
     private ?QuestionCategory $questionCategory = null;
+
+    #[ORM\ManyToOne(inversedBy: 'questions')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $author = null;
 
     #[ORM\Column(
         type: Types::INTEGER,
@@ -126,6 +125,18 @@ class Question
     public function setQuestionCategory(?QuestionCategory $questionCategory): static
     {
         $this->questionCategory = $questionCategory;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): static
+    {
+        $this->author = $author;
 
         return $this;
     }
