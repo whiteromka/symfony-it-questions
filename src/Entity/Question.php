@@ -31,8 +31,8 @@ class Question
     #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id')]
     private ?QuestionCategory $questionCategory = null;
 
-    #[ORM\ManyToOne(inversedBy: 'questions')]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\ManyToOne(targetEntity: User::class, fetch: 'EAGER', inversedBy: 'questions')]
+    #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
     private ?User $author = null;
 
     #[ORM\Column(
