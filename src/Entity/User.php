@@ -132,11 +132,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(int $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
     public function getRoles(): array
     {
         $roles = $this->roles;
         $roles[] = 'ROLE_USER';
         return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $newRoles = array_merge($this->roles, $roles);
+        $this->roles = array_unique($newRoles);
+
+        return $this;
     }
 
     public function eraseCredentials()

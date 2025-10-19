@@ -23,10 +23,10 @@ abstract class BaseController extends AbstractController
         return json_decode($data, true);
     }
 
-    protected function setJsonResponse(bool $susses = true, array $errors = [], array $data = [], int $statusCode = 200): JsonResponse
+    protected function setJsonResponse(bool $success = true, array $errors = [], array $data = [], int $statusCode = 200): JsonResponse
     {
         return new JsonResponse([
-            'success' => $susses,
+            'success' => $success,
             'errors' => $errors,
             'data' => $data,
         ], $statusCode);
