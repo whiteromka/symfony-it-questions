@@ -4,6 +4,11 @@ namespace App\Dto\Auth;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[UniqueEntity(
+    field: 'email',
+    entityClass: User::class,
+    message: 'Этот email уже зарегистрирован'
+)]
 class RegistrationDto
 {
     #[Assert\NotBlank(message: 'Пожалуйста, введите ваше имя')]
