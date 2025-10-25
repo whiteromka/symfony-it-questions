@@ -8,7 +8,7 @@ use App\Repository\QuestionCategoryRepository;
 
 class ContainsCategoryIdValidator extends ConstraintValidator
 {
-    private $questionCategoryRepository;
+    private QuestionCategoryRepository $questionCategoryRepository;
 
     public function __construct(QuestionCategoryRepository $questionCategoryRepository)
     {

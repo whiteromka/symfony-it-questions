@@ -7,6 +7,7 @@ use App\Entity\Question;
 use App\Enum\QuestionStatus;
 use App\Repository\QuestionHistoryRepository;
 use App\Repository\QuestionRepository;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 
@@ -14,6 +15,7 @@ class QuestionService
 {
     public function __construct(
         private readonly QuestionRepository $questionRepository,
+        private readonly UserService $userService,
         private readonly QuestionCategoryService $questionCategoryService,
         private readonly QuestionHistoryRepository $questionHistoryRepository,
         private readonly EntityManagerInterface $entityManager
@@ -59,11 +61,13 @@ class QuestionService
     public function createQuestion(QuestionRequestDto $questionDto): ?Question
     {
         $category = $this->questionCategoryService->getQuestionCategoryOrFail($questionDto->categoryId);
+        $author = $this->userService->getUserOrFail($questionDto->authorId);
 
         $question = new Question();
         $question->setTitle($questionDto->title)
             ->setQuestionCategory($category)
-            ->setText($questionDto->text)
+            ->setAuthor($author)
+            ->setText($questionDto->text ?? '')
             ->setDifficulty($questionDto->difficulty)
             ->setStatus(QuestionStatus::from($questionDto->status));
 

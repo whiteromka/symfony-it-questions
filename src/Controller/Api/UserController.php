@@ -2,7 +2,6 @@
 
 namespace App\Controller\Api;
 
-
 use App\Entity\User;
 use App\Service\QuestionService;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,12 +16,6 @@ class UserController extends BaseController
         SerializerInterface $serializer
     ) {
         parent::__construct($serializer);
-    }
-
-    #[Route('/test', name: 'api_user_test', methods: ['GET'], format: 'json')]
-    public function test()
-    {
-        return new JsonResponse('a');
     }
 
     #[Route('/get/{id}', name: 'api_user_get', methods: ['GET'], format: 'json')]

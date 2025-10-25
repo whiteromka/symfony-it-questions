@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Service\QuestionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -21,6 +20,14 @@ class SiteController extends AbstractController
     public function page2(): Response
     {
         return $this->render('site/page2.html.twig', [
+            'data' => 'some data',
+        ]);
+    }
+
+    #[Route('/some-js', name: 'some-js', methods: ['GET'])]
+    public function test(): Response
+    {
+        return $this->render('site/some-js.html.twig', [
             'data' => 'some data',
         ]);
     }

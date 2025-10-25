@@ -2,15 +2,16 @@ services:
   app:
     build: .
     volumes:
-      - ./:/var/www
-      - ./var/cache:/var/www/var/cache:cached
-      - ./var/log:/var/www/var/log:cached
+      - ./:/var/www:cached
     environment:
       - XDEBUG_MODE=develop,debug
       - XDEBUG_CONFIG=client_host=host.docker.internal
       - APP_ENV=dev
       - RABBITMQ_HOST=rabbitmq
+      - COMPOSER_CACHE_DIR=/tmp/composer-cache
+      - SYMFONY_PHPUNIT_VERSION=9
     user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /var/www
     depends_on:
       - db
       - rabbitmq
@@ -20,10 +21,9 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./:/var/www
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./docker/nginx/logs:/var/log/nginx
-      - ./docker/xdebug/logs:/var/www/docker/xdebug/logs
+      - ./public:/var/www/public:ro,cached
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx/logs:/var/log/nginx:cached
     depends_on:
       - app
 
@@ -38,12 +38,17 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"    # Порт для AMQP (подключение PHP)
-      - "15672:15672"  # Порт веб-интерфейса
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
