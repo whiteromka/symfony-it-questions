@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Dto\Input\QuestionRequestDto;
 use App\Entity\Question;
+use App\Factory\QuestionFactory;
 use App\Form\QuestionType;
 use App\Repository\QuestionRepository;
 use App\Service\QuestionService;
@@ -50,22 +52,25 @@ final class QuestionController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'question_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $question = new Question();
-        $form = $this->createForm(QuestionType::class, $question);
+    #[Route('/create', name: 'question_new', methods: ['GET', 'POST'])]
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        QuestionFactory $questionFactory
+    ): Response {
+        $questionDto = new QuestionRequestDto();
+        $form = $this->createForm(QuestionType::class, $questionDto);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $question = $questionFactory->createFromDto($questionDto);
             $entityManager->persist($question);
             $entityManager->flush();
-
+            //$this->addFlash('success', 'Вопрос успешно создан!');
             return $this->redirectToRoute('question_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('question/new.html.twig', [
-            'question' => $question,
             'form' => $form,
         ]);
     }
@@ -78,18 +83,41 @@ final class QuestionController extends AbstractController
         ]);
     }
 
+//    #[Route('/{id}/edit', name: 'question_edit', methods: ['GET', 'POST'])]
+//    public function edit(Request $request, Question $question, EntityManagerInterface $entityManager): Response
+//    {
+//        $form = $this->createForm(QuestionType::class, $question);
+//        $form->handleRequest($request);
+//
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            $entityManager->flush();
+//
+//            return $this->redirectToRoute('question_index', [], Response::HTTP_SEE_OTHER);
+//        }
+//
+//        return $this->render('question/edit.html.twig', [
+//            'question' => $question,
+//            'form' => $form,
+//        ]);
+//    }
+
     #[Route('/{id}/edit', name: 'question_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Question $question, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(QuestionType::class, $question);
+    public function edit(
+        Request $request,
+        Question $question,
+        EntityManagerInterface $entityManager,
+        QuestionFactory $questionFactory
+    ): Response {
+        $questionDto = $questionFactory->createDtoFromEntity($question);
+        $form = $this->createForm(QuestionType::class, $questionDto);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $questionFactory->createFromDto($questionDto, $question);
             $entityManager->flush();
-
+            //$this->addFlash('success', 'Вопрос успешно обновлен!');
             return $this->redirectToRoute('question_index', [], Response::HTTP_SEE_OTHER);
         }
-
         return $this->render('question/edit.html.twig', [
             'question' => $question,
             'form' => $form,

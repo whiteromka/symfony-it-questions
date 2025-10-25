@@ -33,9 +33,15 @@
     </div>
 
     <div class="col-md-3">
-        {{ form_label(form.questionCategory, 'Категория', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.questionCategory, {'attr': {'class': 'form-select'}}) }}
-        {{ form_errors(form.questionCategory) }}
+        {{ form_label(form.categoryId, 'Категория', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.categoryId, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.categoryId) }}
+    </div>
+
+    <div class="col-md-3">
+        {{ form_label(form.authorId, 'Автор', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.authorId, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.authorId) }}
     </div>
 
     <div class="col-md-3">
@@ -44,11 +50,6 @@
         {{ form_errors(form.status) }}
     </div>
 
-    <div class="col-md-3">
-        {{ form_label(form.createdAt, 'Дата создания', {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.createdAt, {'attr': {'class': 'form-control'}}) }}
-        {{ form_errors(form.createdAt) }}
-    </div>
 </div>
 
 {# Кнопки действий #}

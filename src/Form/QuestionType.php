@@ -2,12 +2,15 @@
 
 namespace App\Form;
 
-use App\Entity\Question;
+use App\Dto\Input\QuestionRequestDto;
 use App\Entity\QuestionCategory;
-use App\Enum\QuestionStatus;
+use App\Entity\User;
+use App\Form\DataTransformer\EntityIdTransformer;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,53 +18,62 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class QuestionType extends AbstractType
 {
+    public function __construct(
+        private EntityManagerInterface $entityManager
+    ) {}
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('title', TextType::class, [
                 'label' => 'Заголовок',
                 'required' => true,
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Введите заголовок вопроса'
-                ]
             ])
             ->add('text', TextareaType::class, [
                 'label' => 'Текст',
                 'required' => false,
-                'attr' => [
-                    'class' => 'form-control summernote-basic',
-                    'rows' => 10
-                ],
             ])
-            ->add('difficulty', null, [
+            ->add('difficulty', IntegerType::class, [
                 'label' => 'Сложность',
-                'attr' => ['class' => 'form-control']
             ])
-            ->add('questionCategory', EntityType::class, [
+            ->add('categoryId', EntityType::class, [
                 'label' => 'Категория',
                 'class' => QuestionCategory::class,
                 'choice_label' => 'name',
                 'placeholder' => 'Выберите категорию',
                 'attr' => ['class' => 'form-select']
             ])
-            ->add('status', EnumType::class, [
-                'label' => 'Статус',
-                'class' => QuestionStatus::class,
-                'choice_label' => fn(QuestionStatus $status) => $status->getValue(),
+            ->add('authorId', EntityType::class, [
+                'label' => 'Автор',
+                'class' => User::class,
+                'choice_label' => 'name',
+                'placeholder' => 'Выберите автора',
                 'attr' => ['class' => 'form-select']
             ])
-            ->add('createdAt', null, [
-                'label' => 'Создано',
-                'widget' => 'single_text',
-                'attr' => ['class' => 'form-control']
+            ->add('status', ChoiceType::class, [
+                'label' => 'Статус',
+                'choices' => [
+                    'Активный' => 1,
+                    'Неактивный' => 0,
+                ],
+                'required' => false,
+                'attr' => ['class' => 'form-select']
             ]);
+
+
+        $builder->get('categoryId')->addModelTransformer(
+            new EntityIdTransformer($this->entityManager, QuestionCategory::class)
+        );
+
+        $builder->get('authorId')->addModelTransformer(
+            new EntityIdTransformer($this->entityManager, User::class)
+        );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Question::class,
+            'data_class' => QuestionRequestDto::class,
         ]);
     }
 }

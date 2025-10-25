@@ -30,3 +30,7 @@ services:
         tags:
             - { name: 'validator.constraint_validator', alias: 'app.contains_category_id' }
 
+    App\Form\QuestionType:
+        arguments: [ '@doctrine.orm.entity_manager' ]
+        tags: [ 'form.type']
+
