@@ -1,18 +1,44 @@
 {% extends 'layouts/layout.html.twig' %}
 
 {% block body %}
-    <h1>site/some-js</h1>
-    <div>
-        <p>{{ data }}</p>
+    <div class="container-fluid">
+        <h1>site/some-js</h1>
+        <div>
+            <p>{{ data }}</p>
+        </div>
+
+        <script defer>
+
+            let question = {
+                title: "New Question2222",
+                text: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                difficulty: 5,
+                categoryId: 2,
+                authorId: 2,
+                status: 1,
+                fo: function () {
+                    return '1';
+                }
+            }
+            let json = JSON.stringify(question);
+            let url = '/api/question/create';
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: json
+            })
+                .then((response) => {
+                    if (response.ok !== true) {
+                        throw new Error('Что то пошло не так. Код ответа ' + response.status);
+                    }
+                    return response.json()
+                })
+                .then(res => console.log('Успех: ', res))
+                .catch((e) => {
+                    console.log('Ошибка: ' + e.message);
+                })
+        </script>
     </div>
-
-    <script defer>
-      let url = '/api/question/get/3';
-      fetch(url)
-          .then(response => response.json())
-          .then((res) => {
-                console.log(res)
-          });
-    </script>
-
 {% endblock %}

@@ -18,7 +18,7 @@ class UserController extends BaseController
         parent::__construct($serializer);
     }
 
-    #[Route('/get/{id}', name: 'api_user_get', methods: ['GET'], format: 'json')]
+    #[Route('/get/{id}', name: 'api_user_get', requirements: ['id' => '\d+'], defaults: ['id' => 2],  methods: ['GET'], format: 'json')]
     public function get(User $user = null): JsonResponse
     {
         if (!$user) {

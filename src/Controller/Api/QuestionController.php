@@ -28,7 +28,7 @@ class QuestionController extends BaseController
         return $this->setJsonResponse(true, [], $data, 201);
     }
 
-    #[Route('/get/{id}', name: 'api_question_get', methods: ['GET'], format: 'json')]
+    #[Route('/get/{id}', name: 'api_question_get', requirements: ['id' => '\d+'], methods: ['GET'], format: 'json')]
     public function get(Question $question = null): JsonResponse
     {
         if (!$question) {

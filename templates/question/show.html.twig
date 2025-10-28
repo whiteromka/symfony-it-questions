@@ -3,42 +3,17 @@
 {% block title %}Question{% endblock %}
 
 {% block body %}
-    <h1>Question</h1>
-
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ question.id }}</td>
-            </tr>
-            <tr>
-                <th>Заголовок</th>
-                <td>{{ question.title }}</td>
-            </tr>
-            <tr>
-                <th>Текст</th>
-                <td>{{ question.text|raw }}</td>
-            </tr>
-            <tr>
-                <th>Сложность</th>
-                <td>{{ question.difficulty }}</td>
-            </tr>
-            <tr>
-                <th>Категория</th>
-                <td>{{ question.questionCategory.name }}</td>
-            </tr>
-            <tr>
-                <th>Статус</th>
-                <td>{{ question.status.value }}</td>
-            </tr>
-            <tr>
-                <th>Создано</th>
-                <td>{{ question.createdAt ? question.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
-
+<div class="container-fluid">
+    <h1>{{ question.title }} <span class="text-info">ID: {{ question.id }}</span></h1>
+    <div class="row">
+        <div class="col-sm-6 col-md-3">Сложность: <b> {{ question.difficulty }} </b></div>
+        <div class="col-sm-6 col-md-3">Категория: <b> {{ question.questionCategory.name }} </b></div>
+        <div class="col-sm-6 col-md-3">Статус: <b> {{ question.status.normalizedValue }} </b></div>
+        <div class="col-sm-6 col-md-3">Автор: <b> {{ question.author.name }} </b></div>
+    </div>
+    {{ question.text|raw }}
     <a class="btn btn-primary" href="{{ path('question_edit', {'id': question.id}) }}">Редактировать</a>
     <a class="btn btn-info" href="{{ path('question_index') }}">Назад к списку вопросов</a>
+</div>
 
 {% endblock %}
