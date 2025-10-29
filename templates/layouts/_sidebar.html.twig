@@ -9,21 +9,30 @@
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                     Случайный вопрос
                 </a>
+
                 <a class="nav-link {{ app.request.get('_route') == 'question_index' ? 'active_link' }}"
                    href="{{ path('question_index') }}">
                     <div class="sb-nav-link-icon">
 
                         <i class="fa-solid fa-list-check"></i>
                     </div>
-                    Вопросы собесов редактирование
+                    Вопросы собесов
                 </a>
 
-                <a class="nav-link {{ app.request.get('_route') == 'question_index' ? 'active_link' }}"
-                   href="{{ path('some-js') }}">
+                <a class="nav-link {{ app.request.get('_route') == 'some_js' ? 'active_link' }}"
+                   href="{{ path('some_js') }}">
                     <div class="sb-nav-link-icon">
                         <i class="fa-solid fa-list-check"></i>
                     </div>
                     JS тест
+                </a>
+
+                <a class="nav-link {{ app.request.get('_route') == 'blog_index' ? 'active_link' }}"
+                   href="{{ path('blog_index') }}">
+                    <div class="sb-nav-link-icon">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    Блог
                 </a>
 
                 <div class="sb-sidenav-menu-heading">Interface</div>

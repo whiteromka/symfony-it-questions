@@ -27,12 +27,12 @@ class QuestionFactory
 
         // Преобразуем ID в объекты
         if ($dto->categoryId) {
-            $category = $this->entityManager->getRepository(QuestionCategory::class)->find($dto->categoryId);
+            $category = $this->entityManager->getReference(QuestionCategory::class, $dto->categoryId);
             $question->setQuestionCategory($category);
         }
 
         if ($dto->authorId) {
-            $author = $this->entityManager->getRepository(User::class)->find($dto->authorId);
+            $author = $this->entityManager->getReference(User::class, $dto->authorId);
             $question->setAuthor($author);
         }
 

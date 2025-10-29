@@ -8,6 +8,12 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Question>
+ *
+ * @method Question|Null find($id)
+ * @method Question|Null findOneBy(array $criteria)
+ * @method Question[] findAll()
+ * @method Question[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method int count(array $criteria)
  */
 class QuestionRepository extends ServiceEntityRepository
 {

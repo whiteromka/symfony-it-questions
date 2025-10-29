@@ -75,7 +75,7 @@ final class QuestionController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'question_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'question_show', requirements: ['id' => '\d+'], defaults: ['id' => 1], methods: ['GET'])]
     public function show(Question $question): Response
     {
         return $this->render('question/show.html.twig', [
@@ -83,25 +83,7 @@ final class QuestionController extends AbstractController
         ]);
     }
 
-//    #[Route('/{id}/edit', name: 'question_edit', methods: ['GET', 'POST'])]
-//    public function edit(Request $request, Question $question, EntityManagerInterface $entityManager): Response
-//    {
-//        $form = $this->createForm(QuestionType::class, $question);
-//        $form->handleRequest($request);
-//
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            $entityManager->flush();
-//
-//            return $this->redirectToRoute('question_index', [], Response::HTTP_SEE_OTHER);
-//        }
-//
-//        return $this->render('question/edit.html.twig', [
-//            'question' => $question,
-//            'form' => $form,
-//        ]);
-//    }
-
-    #[Route('/{id}/edit', name: 'question_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'question_edit', requirements: ['id' => '\d+'], defaults: ['id' => 1], methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         Question $question,
@@ -115,7 +97,6 @@ final class QuestionController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $questionFactory->createFromDto($questionDto, $question);
             $entityManager->flush();
-            //$this->addFlash('success', 'Вопрос успешно обновлен!');
             return $this->redirectToRoute('question_index', [], Response::HTTP_SEE_OTHER);
         }
         return $this->render('question/edit.html.twig', [
@@ -124,7 +105,7 @@ final class QuestionController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'question_delete', methods: ['POST', 'GET'])]
+    #[Route('/{id}/delete', name: 'question_delete', requirements: ['id' => '\d+'], methods: ['POST', 'GET'])]
     public function delete(Request $request, Question $question, EntityManagerInterface $entityManager): Response
     {
 //        if ($this->isCsrfTokenValid('delete'.$question->getId(), $request->getPayload()->getString('_token'))) {

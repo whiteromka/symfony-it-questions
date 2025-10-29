@@ -24,7 +24,7 @@ class SiteController extends AbstractController
         ]);
     }
 
-    #[Route('/some-js', name: 'some-js', methods: ['GET'])]
+    #[Route('/some-js', name: 'some_js', methods: ['GET'])]
     public function someJs(): Response
     {
         return $this->render('site/some-js.html.twig', [
