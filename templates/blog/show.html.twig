@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'layouts/layout.html.twig' %}
 
 {% block title %}Blog{% endblock %}
 
@@ -19,6 +19,12 @@
                 <th>Text</th>
                 <td>{{ blog.text }}</td>
             </tr>
+            {% if blog.blogCategory %}
+            <tr>
+                <th>BlogCategory</th>
+                <td>{{ blog.blogCategory.name }}</td>
+            </tr>
+            {% endif %}
         </tbody>
     </table>
 

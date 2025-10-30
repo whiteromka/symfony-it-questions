@@ -20,6 +20,10 @@ class Blog
     #[ORM\Column(type: Types::TEXT)]
     private ?string $text = null;
 
+    #[ORM\ManyToOne(targetEntity: BlogCategory::class)]
+    #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id')]
+    private BlogCategory|null $blogCategory = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -45,6 +49,18 @@ class Blog
     public function setText(string $text): static
     {
         $this->text = $text;
+
+        return $this;
+    }
+
+    public function getBlogCategory(): ?BlogCategory
+    {
+        return $this->blogCategory;
+    }
+
+    public function setBlogCategory(?BlogCategory $blogCategory): static
+    {
+        $this->blogCategory = $blogCategory;
 
         return $this;
     }
