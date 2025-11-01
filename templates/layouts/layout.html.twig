@@ -12,6 +12,7 @@
     {% block stylesheets %}
         <link href="{{ asset('css/someCss.css') }}" rel="stylesheet" />
         <link href="{{ asset('css/styles.css') }}" rel="stylesheet" />
+        <link href="{{ asset('css/myCss.css') }}" rel="stylesheet" />
         {# Стили Summernote редактора #}
         <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
     {% endblock %}
@@ -53,7 +54,9 @@
     <div id="layoutSidenav_content">
         <main>
             <div class="main-wrap-content">
+                <div class="container-fluid">
                 {% block body %}{% endblock %}
+                </div>
             </div>
         </main>
 

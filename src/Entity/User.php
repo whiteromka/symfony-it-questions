@@ -52,7 +52,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Question>
      */
-    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'author')]
+    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'author', cascade: ['persist'], fetch: 'LAZY')]
     private Collection $questions;
 
     public function getId(): ?int

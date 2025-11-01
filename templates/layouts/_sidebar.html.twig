@@ -3,37 +3,17 @@
         <div class="sb-sidenav-menu">
             <div class="nav">
                 <div class="sb-sidenav-menu-heading">Core</div>
-                <a class="nav-link {{ app.request.get('_route') == 'question_random' ? 'active_link' }}"
-                   href="{{ path('question_random') }}"
-                >
-                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                    Случайный вопрос
-                </a>
-
-                <a class="nav-link {{ app.request.get('_route') == 'question_index' ? 'active_link' }}"
-                   href="{{ path('question_index') }}">
-                    <div class="sb-nav-link-icon">
-
-                        <i class="fa-solid fa-list-check"></i>
-                    </div>
-                    Вопросы собесов
-                </a>
-
-                <a class="nav-link {{ app.request.get('_route') == 'some_js' ? 'active_link' }}"
-                   href="{{ path('some_js') }}">
-                    <div class="sb-nav-link-icon">
-                        <i class="fa-solid fa-list-check"></i>
-                    </div>
-                    JS тест
-                </a>
-
-                <a class="nav-link {{ app.request.get('_route') == 'blog_index' ? 'active_link' }}"
-                   href="{{ path('blog_index') }}">
-                    <div class="sb-nav-link-icon">
-                        <i class="fa-solid fa-list-check"></i>
-                    </div>
-                    Блог
-                </a>
+                {# Основное меню  #}
+                {# См MenuExtension, MenuService  #}
+                {% set menu_items = get_menu_items() %}
+                {% for item in menu_items %}
+                    <a class="nav-link {{ app.request.get('_route') == item.route ? 'active_link' }}"
+                       href="{{ path(item.route) }}"
+                    >
+                        <div class="sb-nav-link-icon"><i class="fas {{ item.icon }}"></i></div>
+                        {{ item.name }}
+                    </a>
+                {% endfor %}
 
                 <div class="sb-sidenav-menu-heading">Interface</div>
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">

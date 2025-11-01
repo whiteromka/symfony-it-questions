@@ -1,0 +1,6 @@
+/* Пункты меню */
+div.nav a.active_link  {color: #00ff88 !important;}
+div.nav a.active_link .sb-nav-link-icon{color: #00ff88 !important;}
+
+/* Кнопки */
+.btn {margin: 2px;}
