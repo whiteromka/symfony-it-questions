@@ -28,7 +28,7 @@ class UserController extends BaseController
         return $this->setJsonResponse(true, [], $data);
     }
 
-    #[Route('/get-email/{id}', name: 'api_user_get', methods: ['GET'], format: 'json')]
+    #[Route('/get-email/{id}', name: 'api_user_get_email', methods: ['GET'], format: 'json')]
     public function getEmail(User $user = null): JsonResponse
     {
         if (!$user) {
@@ -50,5 +50,4 @@ class UserController extends BaseController
             'createdAt' => $user->getCreatedAt()?->format('Y-m-d H:i:s'),
         ];
     }
-
 }

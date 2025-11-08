@@ -1,0 +1,85 @@
+{% extends 'layouts/layout.html.twig' %}
+
+{% block title %}Vue.js Демо{% endblock %}
+
+{% block additional_styles %}
+    <style>
+        .todo-list {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .todo-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">Простой список дел на Vue.js</h1>
+
+        <!-- Контейнер для Vue приложения -->
+        <div id="vue-app">
+            <p class="text-danger" v-text="message"></p>
+            <!-- Используем наш компонент списка дел -->
+            <todo-list></todo-list>
+        </div>
+    </div>
+{% endblock %}
+
+{% block additional_scripts %}
+    <!-- Подключаем Vue.js через CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Подключаем все компоненты которые будут использоваться Vue на этой странице -->
+    <script src="{{ asset('js/vue-components/TodoItem.js') }}"></script>
+    <script src="{{ asset('js/vue-components/TodoList.js') }}"></script>
+
+    <script>
+        // Ждем загрузки DOM и создаем Vue приложение
+        document.addEventListener('DOMContentLoaded', function() {
+            const app = Vue.createApp({
+                // Регистрируем только те компоненты которые используются в корневом приложении
+                components: {
+                    'todo-list': TodoList,
+                },
+                data() {
+                    return {
+                        message: 'It is VUE'
+                    }
+                },
+                mounted() {
+                    let url = 'http://localhost:8080/api/user/get/2'
+                    fetch(url)
+                        .then((response) => {
+                            if (response.ok) {
+                                return response.json()
+                            } else {
+                                throw new Error('Что то пошло не так')
+                            }
+                        })
+                        .then((res) => {
+                            this.message = res.data.name + ' ' + res.data.lastName
+                        })
+                        .catch((e) => {
+                            alert('Ошибка: ' + e.message)
+                        })
+                }
+            });
+
+            // Запускаем приложение в html контейнере #vue-app
+            app.mount('#vue-app');
+            console.log('Vue приложение запущено!');
+        });
+    </script>
+{% endblock %}
