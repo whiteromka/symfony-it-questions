@@ -36,10 +36,10 @@ class BlogType extends AbstractType
                 'class' => BTag::class,
                 'choice_label' => 'name',
                 'multiple' => true,
+                'expanded' => true, // Отображать как чекбоксы
                 'required' => false,
-                'placeholder' => 'Выберите теги',
-                'attr' => ['class' => 'tags-select'],
-                //'expanded' => true, // Отображать как чекбоксы
+                'attr' => ['class' => 'tags-checkboxes'],
+                'row_attr' => ['class' => 'tags-inline-container'],
             ]);
 
         // $builder->get('tags')->addModelTransformer($this->transformer);

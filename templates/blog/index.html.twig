@@ -9,8 +9,10 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Title</th>
-                <th>Text</th>
+                <th>Название</th>
+                <th>Текст</th>
+                <th>Категория</th>
+                <th>Теги</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -20,6 +22,16 @@
                 <td>{{ blog.id }}</td>
                 <td>{{ blog.title }}</td>
                 <td>{{ blog.text }}</td>
+                <td>{{ blog.blogCategory.name }}</td>
+                <td>
+                    {% if blog.tags is not empty %}
+                        {% for tag in blog.tags %}
+                            <span class="badge bg-secondary">{{ tag.name }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
                 <td>
                     <a href="{{ path('blog_show', {'id': blog.id}) }}">show</a>
                     <a href="{{ path('blog_edit', {'id': blog.id}) }}">edit</a>

@@ -4,3 +4,10 @@ div.nav a.active_link .sb-nav-link-icon{color: #00ff88 !important;}
 
 /* Кнопки */
 .btn {margin: 2px;}
+
+/* BTag в строчку */
+.tags-inline-container .form-check {
+    display: inline-block !important;
+    margin-right: 1rem !important;
+    padding-right: 25px;
+}
