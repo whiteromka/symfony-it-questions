@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\User;
 use App\Service\QuestionService;
+use App\Service\UserService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -12,10 +13,18 @@ use Symfony\Component\Serializer\SerializerInterface;
 class UserController extends BaseController
 {
     public function __construct(
-        private readonly QuestionService $questionService,
+        private readonly UserService $userService,
         SerializerInterface $serializer
     ) {
         parent::__construct($serializer);
+    }
+
+    #[Route('/get-all', name: 'api_user_all', methods: ['GET'], format: 'json')]
+    public function all(): JsonResponse
+    {
+        $users = $this->userService->findAll();
+        $data = array_map(fn($question) => $this->entityToArray($question), $users);
+        return $this->setJsonResponse(true, [], $data);
     }
 
     #[Route('/get/{id}', name: 'api_user_get', requirements: ['id' => '\d+'], defaults: ['id' => 2],  methods: ['GET'], format: 'json')]

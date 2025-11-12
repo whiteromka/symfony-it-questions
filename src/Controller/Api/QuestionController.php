@@ -41,7 +41,7 @@ class QuestionController extends BaseController
     #[Route(path: '/get-all', name: 'api_question_get_all', methods: ['GET'], format: 'json')]
     public function getAll(): JsonResponse
     {
-        $questions = $this->questionService->getAllQuestions();
+        $questions = $this->questionService->findAll();
         $data = array_map(fn($question) => $this->entityToArray($question), $questions);
         return $this->setJsonResponse(true, [], $data);
     }

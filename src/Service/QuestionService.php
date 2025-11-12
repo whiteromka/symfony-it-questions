@@ -34,7 +34,7 @@ class QuestionService
     /**
      * Получить все вопросы
      */
-    public function getAllQuestions(): array
+    public function findAll(): array
     {
         return $this->questionRepository->findAll();
     }

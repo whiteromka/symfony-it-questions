@@ -4,13 +4,13 @@
 
 {% block additional_styles %}
     <style>
-        .todo-list {
+        .user-list {
             max-width: 500px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        .todo-item {
+        .user {
             padding: 10px;
             margin: 5px 0;
             background: #f8f9fa;
@@ -27,12 +27,10 @@
 {% block body %}
     <div class="container-fluid px-4">
         <h1 class="mt-4">Простой список дел на Vue.js</h1>
-
-        <!-- Контейнер для Vue приложения -->
         <div id="vue-app">
             <p class="text-danger" v-text="message"></p>
-            <!-- Используем наш компонент списка дел -->
-            <todo-list></todo-list>
+            <user-list></user-list>
+            <code v-text="users"></code>
         </div>
     </div>
 {% endblock %}
@@ -42,24 +40,24 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
     <!-- Подключаем все компоненты которые будут использоваться Vue на этой странице -->
-    <script src="{{ asset('js/vue-components/TodoItem.js') }}"></script>
-    <script src="{{ asset('js/vue-components/TodoList.js') }}"></script>
+    <script src="{{ asset('js/vue-components/User.js') }}"></script>
+    <script src="{{ asset('js/vue-components/UserList.js') }}"></script>
 
     <script>
-        // Ждем загрузки DOM и создаем Vue приложение
         document.addEventListener('DOMContentLoaded', function() {
-            const app = Vue.createApp({
-                // Регистрируем только те компоненты которые используются в корневом приложении
+
+            Vue.createApp({
                 components: {
-                    'todo-list': TodoList,
+                    'user-list': UserList,
                 },
                 data() {
                     return {
-                        message: 'It is VUE'
+                        message: 'It is VUE',
+                        users: [],
                     }
                 },
                 mounted() {
-                    let url = 'http://localhost:8080/api/user/get/2'
+                    let url = 'http://localhost:8080/api/user/get-all'
                     fetch(url)
                         .then((response) => {
                             if (response.ok) {
@@ -69,17 +67,15 @@
                             }
                         })
                         .then((res) => {
-                            this.message = res.data.name + ' ' + res.data.lastName
+                            this.users = res.data
+                            console.log('!!!')
                         })
                         .catch((e) => {
                             alert('Ошибка: ' + e.message)
                         })
                 }
-            });
+            }).mount('#vue-app');
 
-            // Запускаем приложение в html контейнере #vue-app
-            app.mount('#vue-app');
-            console.log('Vue приложение запущено!');
         });
     </script>
 {% endblock %}

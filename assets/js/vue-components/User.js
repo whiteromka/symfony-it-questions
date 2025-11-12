@@ -1,8 +1,9 @@
-const TodoItem = {
+const User = {
     template: `
-        <div class="todo-item">
+        <div class="user">
             <span>{{ text }}</span>
         </div>
     `,
+
     props: ['text']
 }

@@ -1,6 +1,6 @@
-const TodoList = {
+const UserList = {
     template: `
-        <div class="todo-list">
+        <div class="user-list">
             <h3>Мой список дел</h3>
             
             <!-- Поле для ввода нового дела -->
@@ -20,16 +20,16 @@ const TodoList = {
             <!-- Список дел -->
             <div class="todos">
                 <!-- Рендерим компонент TodoItem для каждого дела -->
-                <todo-item 
+                <user 
                     v-for="(todo, index) in todos" :key="index"
                     :text="todo"
-                ></todo-item>
+                ></user>
             </div>
         </div>
     `,
 
     components: {
-        'todo-item': TodoItem
+        'user': User
     },
     data() {
         return {

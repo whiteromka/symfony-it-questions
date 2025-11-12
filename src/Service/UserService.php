@@ -12,6 +12,14 @@ class UserService
     {}
 
     /**
+     * @return User[]
+     */
+    public function findAll(): array
+    {
+        return $this->userRepository->findAll();
+    }
+
+    /**
      * Вернет сущность пользователя
      */
     public function getUserOrFail(int $userId): User
