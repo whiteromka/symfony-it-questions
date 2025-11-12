@@ -29,7 +29,11 @@
         <h1 class="mt-4">Простой список дел на Vue.js</h1>
         <div id="vue-app">
             <p class="text-danger" v-text="message"></p>
-            <user-list></user-list>
+            <user-list
+                    :users="users"
+                    @add-user="addUser"
+                    @remove-user="removeUser"
+            ></user-list>
             <code v-text="users"></code>
         </div>
     </div>
@@ -56,6 +60,14 @@
                         users: [],
                     }
                 },
+                methods: {
+                    addUser(newUser) {
+                        this.users.push(newUser);
+                    },
+                    removeUser(email) {
+                        this.users = this.users.filter(user => user.email !== email);
+                    }
+                },
                 mounted() {
                     let url = 'http://localhost:8080/api/user/get-all'
                     fetch(url)
@@ -68,7 +80,6 @@
                         })
                         .then((res) => {
                             this.users = res.data
-                            console.log('!!!')
                         })
                         .catch((e) => {
                             alert('Ошибка: ' + e.message)
