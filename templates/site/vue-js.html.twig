@@ -3,13 +3,8 @@
 {% block title %}Vue.js Демо{% endblock %}
 
 {% block additional_styles %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .user-list {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
         .user {
             padding: 10px;
             margin: 5px 0;
@@ -21,20 +16,26 @@
         .input-group {
             margin-bottom: 20px;
         }
+
+        .bordered {
+            border: 2px solid #1c82ff;
+        }
+
+        .cp {cursor: pointer}
     </style>
 {% endblock %}
 
 {% block body %}
     <div class="container-fluid px-4">
-        <h1 class="mt-4">Простой список дел на Vue.js</h1>
+        <h1 class="mt-4">Пользователи</h1>
         <div id="vue-app">
             <p class="text-danger" v-text="message"></p>
             <user-list
                     :users="users"
                     @add-user="addUser"
                     @remove-user="removeUser"
+                    @add-estate-to-user="addEstateToUser"
             ></user-list>
-            <code v-text="users"></code>
         </div>
     </div>
 {% endblock %}
@@ -57,7 +58,7 @@
                 data() {
                     return {
                         message: 'It is VUE',
-                        users: [],
+                        users: []
                     }
                 },
                 methods: {
@@ -66,6 +67,15 @@
                     },
                     removeUser(email) {
                         this.users = this.users.filter(user => user.email !== email);
+                    },
+                    addEstateToUser(data) {
+                        const user = this.users.find(u => u.email === data.userEmail);
+                        if (user) {
+                            if (!user.estates) {
+                                user.estates = [];
+                            }
+                            user.estates.push(data.estate);
+                        }
                     }
                 },
                 mounted() {
