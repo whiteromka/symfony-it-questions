@@ -1,7 +1,6 @@
 const User = {
     template: `
         <div class="user cp" :class="selectedUserByEmail === user.email ? 'bordered' : ''">
-        <div class="user cp" :class="selectedUserByEmail === user.email ? 'bordered' : ''">
             <div class="row">
                 <div class="col-sm-8">
                     <span> Имя: {{ user.name }} {{ user.lastName }} {{ user.email }}</span>

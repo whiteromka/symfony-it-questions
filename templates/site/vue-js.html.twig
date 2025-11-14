@@ -41,7 +41,6 @@
 {% endblock %}
 
 {% block additional_scripts %}
-    <!-- Подключаем Vue.js через CDN -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
     <!-- Подключаем все компоненты которые будут использоваться Vue на этой странице -->
@@ -49,54 +48,50 @@
     <script src="{{ asset('js/vue-components/UserList.js') }}"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            Vue.createApp({
-                components: {
-                    'user-list': UserList,
-                },
-                data() {
-                    return {
-                        message: 'It is VUE',
-                        users: []
-                    }
-                },
-                methods: {
-                    addUser(newUser) {
-                        this.users.push(newUser);
-                    },
-                    removeUser(email) {
-                        this.users = this.users.filter(user => user.email !== email);
-                    },
-                    addEstateToUser(data) {
-                        const user = this.users.find(u => u.email === data.userEmail);
-                        if (user) {
-                            if (!user.estates) {
-                                user.estates = [];
-                            }
-                            user.estates.push(data.estate);
-                        }
-                    }
-                },
-                mounted() {
-                    let url = 'http://localhost:8080/api/user/get-all'
-                    fetch(url)
-                        .then((response) => {
-                            if (response.ok) {
-                                return response.json()
-                            } else {
-                                throw new Error('Что то пошло не так')
-                            }
-                        })
-                        .then((res) => {
-                            this.users = res.data
-                        })
-                        .catch((e) => {
-                            alert('Ошибка: ' + e.message)
-                        })
+        Vue.createApp({
+            components: {
+                'user-list': UserList,
+            },
+            data() {
+                return {
+                    message: 'It is VUE',
+                    users: []
                 }
-            }).mount('#vue-app');
-
-        });
+            },
+            methods: {
+                addUser(newUser) {
+                    this.users.push(newUser);
+                },
+                removeUser(email) {
+                    this.users = this.users.filter(user => user.email !== email);
+                },
+                addEstateToUser(data) {
+                    const user = this.users.find(u => u.email === data.userEmail);
+                    if (user) {
+                        if (!user.estates) {
+                            user.estates = [];
+                        }
+                        user.estates.push(data.estate);
+                    }
+                }
+            },
+            mounted() {
+                let url = 'http://localhost:8080/api/user/get-all'
+                fetch(url)
+                    .then((response) => {
+                        if (response.ok) {
+                            return response.json()
+                        } else {
+                            throw new Error('Что то пошло не так')
+                        }
+                    })
+                    .then((res) => {
+                        this.users = res.data
+                    })
+                    .catch((e) => {
+                        alert('Ошибка: ' + e.message)
+                    })
+            }
+        }).mount('#vue-app');
     </script>
 {% endblock %}
