@@ -6,7 +6,6 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-4">
-
                 <form method="post" class="mt-5">
                     {% if error %}
                         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -15,11 +14,11 @@
                     <h1 class="h3 mb-3 font-weight-normal text-center">Введите авторизационные данные</h1>
                     <div class="mb-3">
                         <label for="inputEmail" class="form-label">Email</label>
-                        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+                        <input type="email" value="{{ email }}" name="_username" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
                     </div>
                     <div class="mb-3">
                         <label for="inputPassword" class="form-label">Пароль</label>
-                        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+                        <input type="password" name="_password" id="inputPassword" class="form-control" autocomplete="current-password" required>
                     </div>
 
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
@@ -30,7 +29,6 @@
                         </button>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>

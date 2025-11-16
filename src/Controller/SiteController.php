@@ -35,7 +35,7 @@ class SiteController extends AbstractController
     #[Route('/vue-js', name: 'vue_js', methods: ['GET'])]
     public function vueJs(): Response
     {
-        return $this->render('site/vue-js.html.twig', [
+            return $this->render('site/vue-js.html.twig', [
             'data' => 'vue js',
         ]);
     }

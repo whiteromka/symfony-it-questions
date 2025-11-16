@@ -3,7 +3,6 @@ const UserList = {
         <div class="user-list">
             <div class="row">
                 <div class="col-sm-6">
-                    <!--  -->
                     <div class="users">
                         <user 
                             v-for="(user, index) in users" :key="user.id"

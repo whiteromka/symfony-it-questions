@@ -18,21 +18,18 @@ security:
             lazy: true
             provider: app_user_provider
             form_login:
-                login_path: app_login # URL где отображается форма логина
-                check_path: app_login # URL куда отправляется форма для проверки
-                enable_csrf: true     # Защита от CSRF атак
+                login_path: app_login      # Где форма логина
+                check_path: app_login      # Куда отправлять форму
+                enable_csrf: true          # Защита от CSRF
             logout:
-                path: app_logout      # URL для выхода из системы
-                # Дополнительные настройки логаута (опционально)
-                # target: app_home
+                path: app_logout
 
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/$, roles: PUBLIC_ACCESS }  # Главная страница
-        - { path: ^/public, roles: PUBLIC_ACCESS }  # Публичные пути
-        # Уберите правило ^/ или сделайте его более специфичным
+        - { path: ^/admin, roles: ROLE_ADMIN }           # В /admin - только админы
+        - { path: ^/login, roles: PUBLIC_ACCESS }        # /login - всем доступно
+        - { path: ^/register, roles: PUBLIC_ACCESS }     # /register - всем
+        - { path: ^/$, roles: PUBLIC_ACCESS }            # Главная - всем
+        - { path: ^/public, roles: PUBLIC_ACCESS }
 
 when@test:
     security:
