@@ -72,12 +72,12 @@
     <div id="layoutSidenav_content">
         <main>
             <div class="main-wrap-content">
-                <div class="container-fluid">
+                {% set fullWidthRoutes = ['question_show', 'question_random'] %}
+                <div class="{{ app.request.get('_route') in fullWidthRoutes ? '' : 'container-fluid' }}">
                 {% block body %}{% endblock %}
                 </div>
             </div>
         </main>
-
     </div>
 </div>
 

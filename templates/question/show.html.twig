@@ -4,16 +4,24 @@
 
 {% block body %}
 
-    <h1>{{ question.title }} <span class="text-info">ID: {{ question.id }}</span></h1>
-    <div class="row">
-        <div class="col-sm-6 col-md-3">Сложность: <b> {{ question.difficulty }} </b></div>
-        <div class="col-sm-6 col-md-3">Категория: <b> {{ question.questionCategory.name }} </b></div>
-        <div class="col-sm-6 col-md-3">Статус: <b> {{ question.status.normalizedValue }} </b></div>
-        <div class="col-sm-6 col-md-3">Автор: <b> {{ question.author.name }} </b></div>
+    <div class="text-bg-success p-2">
+        <h1>{{ question.title }} <span class="text-info">ID: {{ question.id }}</span></h1>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-md-3">Сложность: <b> {{ question.difficulty }} </b></div>
+                <div class="col-sm-6 col-md-3">Категория: <b> {{ question.questionCategory.name ?: 'Неизвестно'  }} </b></div>
+                <div class="col-sm-6 col-md-3">Статус: <b> {{ question.status.name }} </b></div>
+                <div class="col-sm-6 col-md-3">Автор: <b> {{ question.author.name ?: 'Неизвестен' }} </b></div>
+            </div>
+        </div>
     </div>
-    {{ question.text|raw }}
-    <a class="btn btn-primary" href="{{ path('question_edit', {'id': question.id}) }}">Редактировать</a>
-    <a class="btn btn-info" href="{{ path('question_index') }}">Назад к списку вопросов</a>
 
+    {% set fullWidthRoutes = ['question_show', 'question_random'] %}
+    <div class="{{ app.request.get('_route') in fullWidthRoutes ? 'container-fluid' : '' }}">
+        {{ question.text|raw }}
+        <br>
+        <a class="btn btn-primary" href="{{ path('question_edit', {'id': question.id}) }}">Редактировать</a>
+        <a class="btn btn-info" href="{{ path('question_index') }}">Назад к списку вопросов</a>
+    </div>
 
 {% endblock %}

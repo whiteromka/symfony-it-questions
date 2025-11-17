@@ -25,9 +25,4 @@ const User = {
     `,
 
     props: ['user', 'selectedUserByEmail'],
-    methods: {
-        removeUser() {
-            this.$emit('remove-user', this.user.email);
-        }
-    }
 }

@@ -17,6 +17,14 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/question')]
 final class QuestionController extends AbstractController
 {
+    #[Route('/', name: 'question_index', methods: ['GET'])]
+    public function index(QuestionRepository $questionRepository): Response
+    {
+        return $this->render('question/index.html.twig', [
+            'questions' => $questionRepository->findAllOrderedById(),
+        ]);
+    }
+
     #[Route('/random', name: 'question_random', methods: ['GET'])]
     public function random(QuestionService $randomQuestionService): Response
     {
@@ -24,31 +32,16 @@ final class QuestionController extends AbstractController
         if (!is_null($question)) {
             $randomQuestionService->createQuestionHistory($question->getId());
         }
-        return $this->render('question/random.html.twig', [
+        return $this->render('question/show.html.twig', [
             'question' => $question,
         ]);
     }
 
-    #[Route('/', name: 'question_index', methods: ['GET'])]
-    public function index(QuestionRepository $questionRepository): Response
+    #[Route('/{id}', name: 'question_show', requirements: ['id' => '\d+'], defaults: ['id' => 1], methods: ['GET'])]
+    public function show(Question $question): Response
     {
-
-        // Получить текущего пользователя
-        // $user = $this->getUser();
-        // Проверить роль
-        // if (!$this->isGranted('ROLE_ADMIN')) {
-        //    throw $this->createAccessDeniedException();
-        // }
-        // Или через аннотации
-        // #[IsGranted('ROLE_ADMIN')]
-        // $user->setPassword(
-        //    $passwordHasher->hashPassword($user, 'plain_password')
-        // );
-
-
-
-        return $this->render('question/index.html.twig', [
-            'questions' => $questionRepository->findAllOrderedById(),
+        return $this->render('question/show.html.twig', [
+            'question' => $question,
         ]);
     }
 
@@ -66,20 +59,11 @@ final class QuestionController extends AbstractController
             $question = $questionFactory->createFromDto($questionDto);
             $entityManager->persist($question);
             $entityManager->flush();
-            //$this->addFlash('success', 'Вопрос успешно создан!');
             return $this->redirectToRoute('question_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('question/new.html.twig', [
             'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'question_show', requirements: ['id' => '\d+'], defaults: ['id' => 1], methods: ['GET'])]
-    public function show(Question $question): Response
-    {
-        return $this->render('question/show.html.twig', [
-            'question' => $question,
         ]);
     }
 
@@ -108,14 +92,8 @@ final class QuestionController extends AbstractController
     #[Route('/{id}/delete', name: 'question_delete', requirements: ['id' => '\d+'], methods: ['POST', 'GET'])]
     public function delete(Request $request, Question $question, EntityManagerInterface $entityManager): Response
     {
-//        if ($this->isCsrfTokenValid('delete'.$question->getId(), $request->getPayload()->getString('_token'))) {
-//            $entityManager->remove($question);
-//            $entityManager->flush();
-//        }
-        if ($question) {
-            $entityManager->remove($question);
-            $entityManager->flush();
-        }
+        $entityManager->remove($question);
+        $entityManager->flush();
         return $this->redirectToRoute('question_index', [], Response::HTTP_SEE_OTHER);
     }
 }

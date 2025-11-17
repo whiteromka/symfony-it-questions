@@ -152,7 +152,9 @@ const UserList = {
                     estate: this.estate,
                     cost: this.cost
                 }
-            });
+            })
+            this.estate = ''
+            this.cost = 0
         }
     }
 }

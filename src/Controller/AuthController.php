@@ -15,10 +15,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class AuthController extends AbstractController
 {
     #[Route('/register', name: 'app_register')]
-    public function register(
-        Request $request,
-        AuthService $authService,
-    ): Response {
+    public function register(Request $request, AuthService $authService): Response {
         if ($this->getUser()) {
             return $this->redirectToRoute('app_home');
         }
@@ -42,7 +39,7 @@ class AuthController extends AbstractController
         ]);
     }
 
-    #[Route('/login', name: 'app_login')]
+    #[Route('/login', name: 'app_login', methods: ['GET'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser()) {
@@ -61,6 +58,6 @@ class AuthController extends AbstractController
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
-        throw new \LogicException('!!!'); // ToDo Пофиксить Logout
+        throw new \LogicException('This method should not be reached.');
     }
 }
