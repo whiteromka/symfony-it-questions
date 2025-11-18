@@ -9,7 +9,7 @@ const UserList = {
                             :user="user"
                             :selectedUserByEmail="selectedUserByEmail"
                             @remove-user="removeUser" 
-                            @add-estate="addEstate(user)"
+                            @add-skill="addSkill(user)"
                         ></user>
                     </div>
                 </div>
@@ -21,8 +21,8 @@ const UserList = {
                             @click="formMode='user'">Пользователи</button>
                           
                         <button type="button" class="btn" :disabled="selectedUserByEmail===''"
-                           :class="formMode==='estate' ? 'btn-primary' : 'btn-outline-secondary'" 
-                           @click="formMode='estate'">Имущество</button>
+                           :class="formMode==='skill' ? 'btn-primary' : 'btn-outline-secondary'" 
+                           @click="formMode='skill'">Навыки</button>
                     </div>
                     <div v-if="formMode === 'user'">
                         <h3>Пользователи</h3>
@@ -51,22 +51,16 @@ const UserList = {
                         </div>
                     </div>
                     <div v-else>
-                        <h3>Имущество {{ selectedUserByEmail }}</h3>
+                        <h3>Навыки {{ selectedUserByEmail }}</h3>
                         <div class="mb-3">
                             <input 
-                                v-model="estate" 
+                                v-model="skill" 
                                 type="text" 
                                 class="form-control mb-1" 
-                                placeholder="Имущество"
+                                placeholder="Навык"
                             >
-                             <input 
-                                v-model="cost" 
-                                type="text" 
-                                class="form-control mb-1" 
-                                placeholder="Стоимость"
-                            >
-                            <button @click="saveEstate()" class="btn btn-success">
-                                Добавить имущество
+                            <button @click="saveSkill()" class="btn btn-success">
+                                Добавить навык
                             </button>
                         </div>
                     </div>
@@ -86,9 +80,8 @@ const UserList = {
             userLastName: '',
             email: '',
             selectedUserByEmail: '',
-            formMode: 'user', //user/estate
-            estate: '',
-            cost: 0,
+            formMode: 'user', //user/skill
+            skill: '',
         }
     },
     watch: {
@@ -131,30 +124,29 @@ const UserList = {
                     "user",
                     "ROLE_USER"
                 ],
-                estates: []
+                skills: []
             }
         },
         removeUser(email) {
             if (email === this.selectedUserByEmail) {
                 this.selectedUserByEmail = ''
-                this.formMode = 'estate'
+                this.formMode = 'skill'
             }
             this.$emit('remove-user', email);
         },
-        addEstate(user) {
-            this.formMode = 'estate'
+        addSkill(user) {
+            this.formMode = 'skill'
             this.selectedUserByEmail = user.email
         },
-        saveEstate() {
-            this.$emit('add-estate-to-user', {
+        saveSkill() {
+            this.$emit('add-skill-to-user', {
                 userEmail: this.selectedUserByEmail,
-                estate: {
-                    estate: this.estate,
-                    cost: this.cost
+                skill: {
+                    skill: this.skill,
+                    level: 100
                 }
             })
-            this.estate = ''
-            this.cost = 0
+            this.skill = ''
         }
     }
 }

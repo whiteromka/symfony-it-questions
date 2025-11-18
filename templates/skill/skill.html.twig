@@ -1,0 +1,292 @@
+{% extends 'layouts/layout.html.twig' %}
+
+{% block title %}Vue.js Демо - Навыки{% endblock %}
+
+{% block additional_styles %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .skill-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid #0d6efd;
+        }
+
+        .skill-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            transition: all 0.2s ease;
+            height: 100%;
+        }
+
+        .skill-item:hover {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-color: #0d6efd;
+            transform: translateY(-1px);
+        }
+
+        .skill-text {
+            word-break: break-word;
+            line-height: 1.2;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            border: none;
+            padding: 8px 16px;
+        }
+
+        .btn-add:hover {
+            background: linear-gradient(135deg, #0a58ca 0%, #084298 100%);
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .skill-item {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mt-4 mb-0">Управление навыками</h1>
+        </div>
+
+        <div id="vue-app">
+            <div class="row">
+                <!-- Левая колонка - Список навыков -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card shadow-sm skill-card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-list-check text-primary me-2"></i>
+                                Список навыков
+                            </h5>
+                            <span class="badge bg-primary rounded-pill" v-text="skills.length"></span>
+                        </div>
+                        <div class="card-body">
+
+                            <!-- Состояние загрузки -->
+                            <div v-if="skills.length === 0 && !loading" class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p class="mb-0">Нет добавленных навыков</p>
+                                <small class="text-muted">Добавьте первый навык используя форму справа</small>
+                            </div>
+
+                            <!-- Список навыков в 3 колонки -->
+                            <div v-else class="row">
+                                <div v-for="(skill, index) in skills" :key="skill.id" class="col-md-4 mb-3">
+                                    <div class="skill-item h-100">
+                                        <div class="d-flex align-items-center justify-content-between h-100">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-tag text-muted me-2"></i>
+                                                <span class="fw-semibold skill-text" v-text="skill.name"></span>
+                                            </div>
+                                            <button
+                                                    @click="removeSkill(skill)"
+                                                    class="btn btn-sm btn-outline-danger flex-shrink-0"
+                                                    title="Удалить навык"
+                                            >
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Индикатор загрузки -->
+                            <div v-if="loading" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Загрузка...</span>
+                                </div>
+                                <p class="text-muted mt-2 mb-0">Загрузка навыков...</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Правая колонка - Добавление навыка -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-plus-circle text-success me-2"></i>
+                                Добавить навык
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form @submit.prevent="addSkill()">
+                                <div class="mb-3">
+                                    <label for="skillInput" class="form-label">Название навыка</label>
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            id="skillInput"
+                                            v-model="newSkill"
+                                            placeholder="Введите название навыка..."
+                                            required
+                                    >
+                                    <div class="form-text">
+                                        Например: JavaScript, PHP, Project Management...
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button
+                                            type="submit"
+                                            class="btn btn-success btn-add"
+                                            :disabled="!newSkill.trim()"
+                                    >
+                                        <i class="fas fa-plus me-1"></i>Добавить навык
+                                    </button>
+                                    <button
+                                            type="button"
+                                            class="btn btn-outline-secondary"
+                                            @click="clearForm"
+                                    >
+                                        <i class="fas fa-eraser me-1"></i>Очистить
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Статистика -->
+                    <div class="card mt-4 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">
+                                <i class="fas fa-chart-bar text-info me-2"></i>
+                                Статистика
+                            </h6>
+                            <div class="row text-center">
+                                <div class="col-6 mb-2">
+                                    <div class="border-end pe-2">
+                                        <h4 class="text-primary mb-0" v-text="skills.length"></h4>
+                                        <small class="text-muted">Всего навыков</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <h4 class="text-success mb-0" v-text="newSkill.length"></h4>
+                                    <small class="text-muted">Символов</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Сообщения об ошибках -->
+            <div v-if="message" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span v-text="message"></span>
+                <button type="button" class="btn-close" @click="clearMessage"></button>
+            </div>
+
+            <!-- Сообщения об успехе -->
+            <div v-if="successMessage" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span v-text="successMessage"></span>
+                <button type="button" class="btn-close" @click="clearSuccessMessage"></button>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block additional_scripts %}
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <script>
+        Vue.createApp({
+            data() {
+                return {
+                    skills: [],
+                    newSkill: '',
+                    message: '',
+                    successMessage: '',
+                    loading: true
+                }
+            },
+            methods: {
+                addSkill() {
+                    if (!this.newSkill.trim()) {
+                        this.message = 'Пожалуйста, введите название навыка';
+                        return;
+                    }
+
+                    // ToDo !!!!
+                    const newSkillObj = {
+                        id: Date.now(), // временный ID
+                        name: this.newSkill.trim()
+                    };
+
+                    this.skills.push(newSkillObj);
+                    this.successMessage = `Навык "${this.newSkill}" успешно добавлен!`;
+                    this.newSkill = '';
+
+                    setTimeout(() => {this.successMessage = '';}, 3000);
+                },
+
+                removeSkill(skill) {
+                    if (confirm(`Вы уверены, что хотите удалить навык "${skill.name}"?`)) {
+                        this.skills = this.skills.filter(s => s.id !== skill.id);
+                        this.successMessage = `Навык "${skill.name}" удален`;
+
+                        setTimeout(() => {
+                            this.successMessage = '';
+                        }, 3000);
+                    }
+                },
+
+                clearForm() {
+                    this.newSkill = '';
+                    this.message = '';
+                },
+
+                clearMessage() {
+                    this.message = '';
+                },
+
+                clearSuccessMessage() {
+                    this.successMessage = '';
+                }
+            },
+            mounted() {
+                let url = 'http://localhost:8080/api/skill/get-all';
+
+                fetch(url)
+                    .then((response) => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            throw new Error('Ошибка при загрузке данных');
+                        }
+                    })
+                    .then((res) => {
+                        this.skills = res.data || [];
+                        this.loading = false;
+                    })
+                    .catch((e) => {
+                        this.message = 'Ошибка загрузки: ' + e.message;
+                        this.loading = false;
+                    });
+            }
+        }).mount('#vue-app');
+    </script>
+{% endblock %}

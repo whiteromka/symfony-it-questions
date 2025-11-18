@@ -1,0 +1,96 @@
+{% extends 'layouts/layout.html.twig' %}
+
+{% block title %}Vue.js Демо{% endblock %}
+
+{% block additional_styles %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .user {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .bordered {
+            border: 2px solid #1c82ff;
+        }
+
+        .cp {cursor: pointer}
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">Пользователи</h1>
+        <div id="vue-app">
+            <p class="text-danger" v-text="message"></p>
+            <user-list
+                    :users="users"
+                    @add-user="addUser"
+                    @remove-user="removeUser"
+                    @add-skill-to-user="addSkillToUser"
+            ></user-list>
+        </div>
+    </div>
+{% endblock %}
+
+{% block additional_scripts %}
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <script src="{{ asset('js/vue-components/User.js') }}"></script>
+    <script src="{{ asset('js/vue-components/UserList.js') }}"></script>
+
+    <script>
+        Vue.createApp({
+            components: {
+                'user-list': UserList,
+            },
+            data() {
+                return {
+                    message: 'It is VUE',
+                    users: []
+                }
+            },
+            methods: {
+                addUser(newUser) {
+                    this.users.push(newUser);
+                },
+                removeUser(email) {
+                    this.users = this.users.filter(user => user.email !== email);
+                },
+                addSkillToUser(data) {
+                    const user = this.users.find(u => u.email === data.userEmail);
+                    if (user) {
+                        if (!user.skills) {
+                            user.skills = [];
+                        }
+                        user.skills.push(data.skill);
+                    }
+                }
+            },
+            mounted() {
+                let url = 'http://localhost:8080/api/user/get-all'
+                fetch(url)
+                    .then((response) => {
+                        if (response.ok) {
+                            return response.json()
+                        } else {
+                            throw new Error('Что то пошло не так')
+                        }
+                    })
+                    .then((res) => {
+                        this.users = res.data
+                    })
+                    .catch((e) => {
+                        alert('Ошибка: ' + e.message)
+                    })
+            }
+        }).mount('#vue-app');
+    </script>
+{% endblock %}

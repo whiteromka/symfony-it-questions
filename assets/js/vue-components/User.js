@@ -6,7 +6,7 @@ const User = {
                     <span> Имя: {{ user.name }} {{ user.lastName }} {{ user.email }}</span>
                 </div>
                 <div class="col-sm-4 text-end">
-                    <button class="btn btn-primary" @click="$emit('add-estate', user)">
+                    <button class="btn btn-primary" @click="$emit('add-skill', user)">
                         <i class="fa fa-address-card" aria-hidden="true"></i>
                     </button>
                     <button class="btn btn-danger" @click="$emit('remove-user', user.email)">
@@ -14,11 +14,9 @@ const User = {
                     </button>
                 </div>
             </div>
-            <div v-if="user.estates && user.estates.length > 0">
+            <div v-if="user.skills && user.skills.length > 0">
                 <ul>
-                    <li v-for="(estate, idx) in user.estates" :key="idx">
-                    {{ estate.estate }} {{ estate.cost }}
-                    </li>
+                    <li v-for="(skill, idx) in user.skills" :key="idx"> {{ skill.skill }} </li>
                 </ul>
             </div>
         </div>

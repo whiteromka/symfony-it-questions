@@ -18,6 +18,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct() {
         $this->createdAt = new DateTimeImmutable();
         $this->questions = new ArrayCollection();
+        $this->skills = new ArrayCollection();
     }
 
     #[ORM\Id]
@@ -54,6 +55,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'author', cascade: ['persist'], fetch: 'LAZY')]
     private Collection $questions;
+
+    /**
+     * @var Collection<int, Skill>
+     */
+    #[ORM\JoinTable(name: 'user_to_skill')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'skill_id', referencedColumnName: 'id')]
+    #[ORM\ManyToMany(targetEntity: Skill::class, inversedBy: 'users')]
+    private Collection $skills;
 
     public function getId(): ?int
     {
@@ -195,6 +205,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $question->setAuthor(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Skill>
+     */
+    public function getSkills(): Collection
+    {
+        return $this->skills;
+    }
+
+    public function addSkill(Skill $skill): static
+    {
+        if (!$this->skills->contains($skill)) {
+            $this->skills->add($skill);
+        }
+
+        return $this;
+    }
+
+    public function removeSkill(Skill $skill): static
+    {
+        $this->skills->removeElement($skill);
 
         return $this;
     }
