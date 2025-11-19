@@ -31,8 +31,8 @@ class SkillController extends BaseController
     #[Route('/create', name: 'api_skill_new', methods: ['POST'], format: 'json')]
     public function create(#[MapRequestPayload] SkillRequestDto $skillRequestDto): JsonResponse
     {
-        $question = $this->skillService->createSkill($skillRequestDto);
-        $data = $this->entityToArray($question);
+        $skill = $this->skillService->createSkill($skillRequestDto);
+        $data = $this->entityToArray($skill);
         return $this->setJsonResponse(true, [], $data, 201);
     }
 

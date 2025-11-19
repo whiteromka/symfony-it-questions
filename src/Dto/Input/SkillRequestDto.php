@@ -2,6 +2,7 @@
 
 namespace App\Dto\Input;
 
+use App\Validator\UniqueSkillName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class SkillRequestDto
@@ -13,8 +14,13 @@ class SkillRequestDto
         minMessage: 'Заголовок должен быть длиннее {{ limit }} символов',
         maxMessage: 'Заголовок не может быть короче {{ limit }} символов'
     )]
+    #[UniqueSkillName]
     public string $name;
 
     #[Assert\Type('string')]
-    public string $descr;
+    #[Assert\Length(
+        max: 1000,
+        maxMessage: 'Описание не должно превышать {{ limit }} символов'
+    )]
+    public ?string $descr = null;
 }
