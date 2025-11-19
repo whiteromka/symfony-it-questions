@@ -244,14 +244,28 @@
                 },
 
                 removeSkill(skill) {
-                    if (confirm(`Вы уверены, что хотите удалить навык "${skill.name}"?`)) {
-                        this.skills = this.skills.filter(s => s.id !== skill.id);
-                        this.successMessage = `Навык "${skill.name}" удален`;
-
-                        setTimeout(() => {
-                            this.successMessage = '';
-                        }, 3000);
-                    }
+                    let url = 'http://localhost:8080/api/skill/delete/' + skill.id
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                return response.json()
+                            } else {
+                                throw new Error('Ошибка при отправке запроса (' + response.status + ')')
+                            }
+                        })
+                        .then(res => {
+                            if (res.success) {
+                                this.skills = this.skills.filter(s => s.id !== skill.id);
+                            } else {
+                                this.message = res.data.errors[0] ?? 'Произошла ошибка'
+                            }
+                        })
+                        .catch(e => {
+                            this.message = 'Ошибка загрузки: ' + e.message;
+                        })
                 },
 
                 clearForm() {

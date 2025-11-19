@@ -25,7 +25,7 @@ class UniqueSkillNameValidator extends ConstraintValidator
         }
 
         $existingSkill = $this->entityManager->getRepository(Skill::class)->findOneBy(['name' => $value]);
-        if (empty($existingSkill)) {
+        if (!empty($existingSkill)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $value)
                 ->addViolation();
