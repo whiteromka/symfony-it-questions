@@ -36,7 +36,7 @@ class SkillController extends BaseController
         return $this->setJsonResponse(true, [], $data, 201);
     }
 
-    #[Route('/delete/{id}', name: 'api_skill_delete', requirements: ['id' => '\d+'],  methods: ['POST'], format: 'json')]
+    #[Route('/delete/{name}', name: 'api_skill_delete', requirements: ['name' => '.+'],  methods: ['POST'], format: 'json')]
     public function delete(Skill $skill): JsonResponse
     {
         if (!$skill) {

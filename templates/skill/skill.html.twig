@@ -83,7 +83,7 @@
                                             type="text"
                                             class="form-control"
                                             id="skillInput"
-                                            v-model="newSkill"
+                                            v-model="newSkillName"
                                             placeholder="Введите название навыка..."
                                             required
                                     >
@@ -96,7 +96,7 @@
                                     <button
                                             type="submit"
                                             class="btn btn-success btn-add"
-                                            :disabled="!newSkill.trim()"
+                                            :disabled="!newSkillName.trim()"
                                     >
                                         <i class="fas fa-plus me-1"></i>Добавить навык
                                     </button>
@@ -127,7 +127,7 @@
                                     </div>
                                 </div>
                                 <div class="col-6 mb-2">
-                                    <h4 class="text-success mb-0" v-text="newSkill.length"></h4>
+                                    <h4 class="text-success mb-0" v-text="newSkillName.length"></h4>
                                     <small class="text-muted">Символов</small>
                                 </div>
                             </div>
@@ -151,59 +151,69 @@
     <script src="{{ asset('js/Axios1.13.2.js') }}"></script>
     <script src="{{ asset('js/Vue.3.5.24.js') }}"></script>
 
-    <script>
+    <script type="module">
+        import { apiErrorHandle } from "{{ asset('js/common/apiErrorHandle.js') }}"
+
         Vue.createApp({
             data() {
                 return {
                     skills: [],
-                    newSkill: '',
+                    newSkillName: '',
+                    newSkillDeskr: '',
+
                     errorMessage: '',
                     loading: true
                 }
             },
             methods: {
                 addSkill() {
-                    if (!this.newSkill.trim()) {
+                    if (!this.newSkillName.trim()) {
                         this.errorMessage = 'Пожалуйста, введите название навыка';
                         return;
                     }
+                    let isDuplicate = this.skills.find(skill => skill.name === this.newSkillName.trim());
+                    if (isDuplicate) {
+                        this.errorMessage = 'Навык с таким названием уже существует';
+                        return;
+                    }
 
-                    // ToDo !!!!
-                    const newSkillObj = {
-                        id: Date.now(), // временный ID
-                        name: this.newSkill.trim()
+                    let newSkillObj = {
+                        id: Date.now(),
+                        name: this.newSkillName.trim(),
+                        descr: this.newSkillDeskr?.trim() || ''
                     };
 
-                    this.skills.push(newSkillObj);
-                },
-
-                removeSkill(skill) {
-                    let url = 'http://localhost:8080/api/skill/delete/' + skill.id;
-
-                    axios.post(url)
+                    axios.post('http://localhost:8080/api/skill/create', newSkillObj)
                         .then(response => {
                             if (response.data.success) {
-                                this.skills = this.skills.filter(s => s.id !== skill.id);
+                                this.skills.push(newSkillObj);
+                                this.clearForm()
                             } else {
                                 this.errorMessage = response.data.data?.errors?.[0] ?? 'Произошла ошибка на сервере';
                             }
                         })
                         .catch(error => {
-                            this.handleError(error, 'Ошибка при удалении навыка');
+                            this.errorMessage = apiErrorHandle(error, 'Произошла ошибка при добавлении навыка')
+                        });
+                },
+                removeSkill(skill) {
+                    let url = 'http://localhost:8080/api/skill/delete/' + skill.name;
+                    axios.post(url)
+                        .then(response => {
+                            if (response.data.success) {
+                                this.skills = this.skills.filter(s => s.name !== skill.name);
+                            } else {
+                                this.errorMessage = response.data.data?.errors?.[0] ?? 'Произошла ошибка на сервере';
+                            }
+                        })
+                        .catch(error => {
+                            this.errorMessage = apiErrorHandle(error, 'Произошла ошибка при удалении навыка')
                         });
                 },
                 clearForm() {
-                    this.newSkill = '';
+                    this.newSkillName = '';
+                    this.newSkillDescr = '';
                     this.errorMessage = '';
-                },
-                handleError(error, defaultMessage = 'Произошла ошибка') {
-                    if (error.response) {
-                        this.errorMessage = `Ошибка сервера: ${error.response.status}`; // Сервер ответил с ошибкой (4xx, 5xx)
-                    } else if (error.request) {
-                        this.errorMessage = 'Ошибка сети: нет ответа от сервера'; // Запрос был отправлен, но ответ не получен
-                    } else {
-                        this.errorMessage = defaultMessage + ': ' + error.message; // Ошибка в настройках запроса
-                    }
                 },
             },
             mounted() {
@@ -214,7 +224,7 @@
                         this.loading = false;
                     })
                     .catch(error => {
-                        this.handleError(error, 'Ошибка загрузки данных');
+                        this.errorMessage = apiErrorHandle(error, 'Ошибка загрузки данных')
                         this.loading = false;
                     });
             }

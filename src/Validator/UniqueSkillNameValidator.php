@@ -2,8 +2,7 @@
 
 namespace App\Validator;
 
-use App\Entity\Skill;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\SkillRepository;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -11,7 +10,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class UniqueSkillNameValidator extends ConstraintValidator
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private readonly SkillRepository $skillRepository
     ) {}
 
     public function validate($value, Constraint $constraint): void
@@ -24,7 +23,7 @@ class UniqueSkillNameValidator extends ConstraintValidator
             return;
         }
 
-        $existingSkill = $this->entityManager->getRepository(Skill::class)->findOneBy(['name' => $value]);
+        $existingSkill = $this->skillRepository->findOneByNameCaseInsensitive($value);
         if (!empty($existingSkill)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $value)

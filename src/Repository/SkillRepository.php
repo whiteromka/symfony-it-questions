@@ -15,4 +15,16 @@ class SkillRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Skill::class);
     }
+
+    /**
+     * Регистронезависимый поис по имени
+     */
+    public function findOneByNameCaseInsensitive(string $name): ?Skill
+    {
+        return $this->createQueryBuilder('s')
+            ->where('LOWER(s.name) = LOWER(:name)')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
