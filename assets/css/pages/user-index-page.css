@@ -1,0 +1,17 @@
+.user {
+    padding: 10px;
+    margin: 5px 0;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.bordered {
+    border: 2px solid #1c82ff;
+}
+
+.cp {cursor: pointer}

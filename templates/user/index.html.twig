@@ -1,28 +1,9 @@
 {% extends 'layouts/layout.html.twig' %}
 
-{% block title %}Vue.js Демо{% endblock %}
+{% block title %}Пользователи и навыки{% endblock %}
 
 {% block additional_styles %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .user {
-            padding: 10px;
-            margin: 5px 0;
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .bordered {
-            border: 2px solid #1c82ff;
-        }
-
-        .cp {cursor: pointer}
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/pages/user-index-page.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -41,7 +22,7 @@
 {% endblock %}
 
 {% block additional_scripts %}
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="{{ asset('js/Vue.3.5.24.js') }}"></script>
 
     <script src="{{ asset('js/vue-components/User.js') }}"></script>
     <script src="{{ asset('js/vue-components/UserList.js') }}"></script>
