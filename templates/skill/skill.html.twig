@@ -137,17 +137,10 @@
             </div>
 
             <!-- Сообщения об ошибках -->
-            <div v-if="message" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
                 <i class="fas fa-exclamation-triangle me-2"></i>
-                <span v-text="message"></span>
-                <button type="button" class="btn-close" @click="clearMessage"></button>
-            </div>
-
-            <!-- Сообщения об успехе -->
-            <div v-if="successMessage" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-                <i class="fas fa-check-circle me-2"></i>
-                <span v-text="successMessage"></span>
-                <button type="button" class="btn-close" @click="clearSuccessMessage"></button>
+                <span v-text="errorMessage"></span>
+                <button type="button" class="btn-close" @click="errorMessage = ''"></button>
             </div>
 
         </div>
@@ -155,6 +148,7 @@
 {% endblock %}
 
 {% block additional_scripts %}
+    <script src="{{ asset('js/Axios1.13.2.js') }}"></script>
     <script src="{{ asset('js/Vue.3.5.24.js') }}"></script>
 
     <script>
@@ -163,15 +157,14 @@
                 return {
                     skills: [],
                     newSkill: '',
-                    message: '',
-                    successMessage: '',
+                    errorMessage: '',
                     loading: true
                 }
             },
             methods: {
                 addSkill() {
                     if (!this.newSkill.trim()) {
-                        this.message = 'Пожалуйста, введите название навыка';
+                        this.errorMessage = 'Пожалуйста, введите название навыка';
                         return;
                     }
 
@@ -185,60 +178,43 @@
                 },
 
                 removeSkill(skill) {
-                    let url = 'http://localhost:8080/api/skill/delete/' + skill.id
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                    })
+                    let url = 'http://localhost:8080/api/skill/delete/' + skill.id;
+
+                    axios.post(url)
                         .then(response => {
-                            if (response.ok) {
-                                return response.json()
-                            } else {
-                                throw new Error('Ошибка при отправке запроса (' + response.status + ')')
-                            }
-                        })
-                        .then(res => {
-                            if (res.success) {
+                            if (response.data.success) {
                                 this.skills = this.skills.filter(s => s.id !== skill.id);
                             } else {
-                                this.message = res.data.errors[0] ?? 'Произошла ошибка'
+                                this.errorMessage = response.data.data?.errors?.[0] ?? 'Произошла ошибка на сервере';
                             }
                         })
-                        .catch(e => {
-                            this.message = 'Ошибка загрузки: ' + e.message;
-                        })
+                        .catch(error => {
+                            this.handleError(error, 'Ошибка при удалении навыка');
+                        });
                 },
-
                 clearForm() {
                     this.newSkill = '';
-                    this.message = '';
+                    this.errorMessage = '';
                 },
-
-                clearMessage() {
-                    this.message = '';
+                handleError(error, defaultMessage = 'Произошла ошибка') {
+                    if (error.response) {
+                        this.errorMessage = `Ошибка сервера: ${error.response.status}`; // Сервер ответил с ошибкой (4xx, 5xx)
+                    } else if (error.request) {
+                        this.errorMessage = 'Ошибка сети: нет ответа от сервера'; // Запрос был отправлен, но ответ не получен
+                    } else {
+                        this.errorMessage = defaultMessage + ': ' + error.message; // Ошибка в настройках запроса
+                    }
                 },
-
-                clearSuccessMessage() {
-                    this.successMessage = '';
-                }
             },
             mounted() {
                 let url = 'http://localhost:8080/api/skill/get-all';
-
-                fetch(url)
-                    .then((response) => {
-                        if (response.ok) {
-                            return response.json();
-                        } else {
-                            throw new Error('Ошибка при загрузке данных');
-                        }
-                    })
-                    .then((res) => {
-                        this.skills = res.data || [];
+                axios.get(url)
+                    .then(response => {
+                        this.skills = response.data.data || [];
                         this.loading = false;
                     })
-                    .catch((e) => {
-                        this.message = 'Ошибка загрузки: ' + e.message;
+                    .catch(error => {
+                        this.handleError(error, 'Ошибка загрузки данных');
                         this.loading = false;
                     });
             }
