@@ -13,3 +13,8 @@
     {% else %}
     {% endif %}
 {% endblock %}
+
+{% block additional_scripts %}
+    <script src="{{ asset('js/summernote-min.js') }}"></script>
+    <script src="{{ asset('js/summernote-ru.js') }}"></script>
+{% endblock %}

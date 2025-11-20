@@ -81,15 +81,12 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ asset('js/jQuery.3.6.0.js') }}"></script>
 <script src="{{ asset('js/bootstrap5.js') }}" crossorigin="anonymous"></script>
 <script src="{{ asset('js/fontawesome.js') }}" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ru-RU.min.js"></script>
 <script src="{{ asset('js/scripts.js') }}"></script>
 
 {% block javascripts %}{% endblock %}
-{#{% block importmap %}{{ importmap('app') }}{% endblock %}#}
 {% block additional_scripts %}{% endblock %}
 
 </body>
