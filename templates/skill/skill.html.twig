@@ -35,20 +35,39 @@
 
                             <!-- Список навыков в 3 колонки -->
                             <div v-else class="row">
-                                <div v-for="(skill, index) in skills" :key="skill.id" class="col-md-4 mb-3">
-                                    <div class="skill-item h-75">
+                                <div v-for="(skill, index) in skills" :key="skill.id" class="col-md-4 col-lg-6 col-xl-4 mb-3">
+                                    <div class="skill-item h-75" :class="isDuplicateError && skill.name.toLowerCase() === newSkillName.toLowerCase() ? 'skill-duplicate duplicate-blink' : ''">
                                         <div class="d-flex align-items-center justify-content-between h-100">
                                             <div class="d-flex align-items-center">
                                                 <i class="fas fa-tag text-muted me-2"></i>
                                                 <span class="fw-semibold skill-text" v-text="skill.name"></span>
                                             </div>
-                                            <button
-                                                    @click="removeSkill(skill)"
-                                                    class="btn btn-sm btn-outline-danger flex-shrink-0"
+                                            <div class="position-relative">
+                                                <button
+                                                    @click="showConfirmDelete(skill)"
+                                                    class="btn-remove-tiny"
                                                     title="Удалить навык"
-                                            >
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                                    v-if="!skill.confirmingDelete"
+                                                >
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+
+                                                <!-- Окно подтверждения -->
+                                                <div v-if="skill.confirmingDelete" class="confirm-delete bg-warning_">
+                                                    <b class="d-block mb-1">Удалить?</b>
+                                                    <div class="d-flex justify-content-center">
+                                                        <button
+                                                            @click="confirmDelete(skill)"
+                                                            class="btn btn-sm btn-danger"
+                                                        >Да</button>
+                                                        <button
+                                                            @click="cancelDelete(skill)"
+                                                            class="btn btn-sm btn-secondary ms-1"
+                                                        >Нет</button>
+                                                    </div>
+                                                </div>
+
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -89,18 +108,18 @@
                                 </div>
 
                                 <div class="row g-2">
-                                    <div class="col-12 col-xl-6">
+                                    <div class="col-12 col-sm-6 col-md-6 col-lg-12 col-xl-6">
                                         <button type="submit" class="btn btn-success btn-add w-100"
                                                 :disabled="!newSkillName.trim()"
                                         >
-                                            <i class="fas fa-plus me-1"></i>Добавить
+                                            <i class=""></i>Добавить
                                         </button>
                                     </div>
-                                    <div class="col-12 col-xl-6">
+                                    <div class="col-12 col-sm-6 col-md-6 col-lg-12 col-xl-6">
                                         <button type="button" class="btn btn-outline-secondary w-100"
                                                 @click="clearForm"
                                         >
-                                            <i class="fas fa-eraser me-1"></i>Очистить
+                                            <i class=""></i>Очистить
                                         </button>
                                     </div>
                                 </div>
@@ -115,16 +134,17 @@
                                     </div>
                                 </div>
                             </div>
+                            <br><br>
+
+                            <!-- Сообщения об ошибках -->
+                            <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <span v-text="errorMessage"></span>
+                                <button type="button" class="btn-close" @click="errorMessage = ''"></button>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-            <!-- Сообщения об ошибках -->
-            <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <span v-text="errorMessage"></span>
-                <button type="button" class="btn-close" @click="errorMessage = ''"></button>
-            </div>
 
         </div>
     </div>
@@ -134,96 +154,158 @@
     <script src="{{ asset('js/Axios1.13.2.js') }}"></script>
     <script src="{{ asset('js/Vue.3.5.24.js') }}"></script>
 
-    <script type="module">
-        import { apiErrorHandle, getCsrfToken } from "{{ asset('js/common/formHelper.js') }}"
+<script type="module">
+    import { apiErrorHandle, getCsrfToken } from "{{ asset('js/common/formHelper.js') }}"
 
-        axios.defaults.headers.common['X-CSRF-TOKEN'] = getCsrfToken();
+    axios.defaults.headers.common['X-CSRF-TOKEN'] = getCsrfToken();
 
-        Vue.createApp({
-            data() {
-                return {
-                    skills: [],
-                    newSkillName: '',
-                    newSkillDeskr: '',
+    Vue.createApp({
+        data() {
+            return {
+                skills: [],
+                newSkillName: '',
+                newSkillDeskr: '',
 
-                    errorMessage: '',
-                    loading: true
+                errorMessage: '',
+                loading: true,
+
+                isDuplicateError: false
+            }
+        },
+        computed: {
+            displayLength() {
+                return Math.min(this.newSkillName.length, 30);
+            },
+            lengthColor() {
+                const length = this.newSkillName.length;
+                if (length >= 23) return 'text-danger';
+                if (length >= 15) return 'text-warning';
+                return 'text-success';
+            }
+        },
+        watch: {
+            newSkillName(newValue) {
+                this.checkDuplicate(newValue);
+            },
+            skills() {
+                this.checkDuplicate(this.newSkillName);
+            }
+        },
+        methods: {
+            addSkill() {
+                if (!this.newSkillName.trim()) {
+                    this.errorMessage = 'Пожалуйста, введите название навыка';
+                    return;
                 }
-            },
-            computed: {
-                displayLength() {
-                    return Math.min(this.newSkillName.length, 30);
-                },
-                lengthColor() {
-                    const length = this.newSkillName.length;
-                    if (length >= 23) return 'text-danger';
-                    if (length >= 15) return 'text-warning';
-                    return 'text-success';
+                let isDuplicate = this.skills.find(skill => skill.name === this.newSkillName.trim());
+                if (isDuplicate) {
+                    this.errorMessage = 'Навык с таким названием уже существует';
+                    return;
                 }
-            },
-            methods: {
-                addSkill() {
-                    if (!this.newSkillName.trim()) {
-                        this.errorMessage = 'Пожалуйста, введите название навыка';
-                        return;
-                    }
-                    let isDuplicate = this.skills.find(skill => skill.name === this.newSkillName.trim());
-                    if (isDuplicate) {
-                        this.errorMessage = 'Навык с таким названием уже существует';
-                        return;
-                    }
 
-                    let newSkillObj = {
-                        id: Date.now(),
-                        name: this.newSkillName.trim(),
-                        descr: this.newSkillDeskr?.trim() || ''
-                    };
+                let newSkillObj = {
+                    id: Date.now(),
+                    name: this.newSkillName.trim(),
+                    descr: this.newSkillDeskr?.trim() || ''
+                };
 
-                    axios.post('http://localhost:8080/api/skill/create', newSkillObj)
-                        .then(response => {
-                            if (response.data.success) {
-                                this.skills.push(newSkillObj);
-                                this.clearForm()
-                            } else {
-                                this.errorMessage = response.data.data?.errors?.[0] ?? 'Произошла ошибка на сервере';
-                            }
-                        })
-                        .catch(error => {
-                            this.errorMessage = apiErrorHandle(error, 'Произошла ошибка при добавлении навыка')
-                        });
-                },
-                removeSkill(skill) {
-                    let url = 'http://localhost:8080/api/skill/delete/' + skill.name;
-                    axios.post(url)
-                        .then(response => {
-                            if (response.data.success) {
-                                this.skills = this.skills.filter(s => s.name !== skill.name);
-                            } else {
-                                this.errorMessage = response.data.data?.errors?.[0] ?? 'Произошла ошибка на сервере';
-                            }
-                        })
-                        .catch(error => {
-                            this.errorMessage = apiErrorHandle(error, 'Произошла ошибка при удалении навыка')
-                        });
-                },
-                clearForm() {
-                    this.newSkillName = '';
-                    this.newSkillDescr = '';
-                    this.errorMessage = '';
-                },
-            },
-            mounted() {
-                let url = 'http://localhost:8080/api/skill/get-all';
-                axios.get(url)
+                axios.post('http://localhost:8080/api/skill/create', newSkillObj)
                     .then(response => {
-                        this.skills = response.data.data || [];
-                        this.loading = false;
+                        if (response.data.success) {
+                            this.skills.push(newSkillObj);
+                            this.clearForm()
+                        } else {
+                            this.errorMessage = response.data.data?.errors?.[0] ?? 'Произошла ошибка на сервере';
+                        }
                     })
                     .catch(error => {
-                        this.errorMessage = apiErrorHandle(error, 'Ошибка загрузки данных')
-                        this.loading = false;
+                        this.errorMessage = apiErrorHandle(error, 'Произошла ошибка при добавлении навыка')
                     });
+            },
+            removeSkill(skill) {
+                let url = 'http://localhost:8080/api/skill/delete/' + skill.name;
+                axios.post(url)
+                    .then(response => {
+                        if (response.data.success) {
+                            this.skills = this.skills.filter(s => s.name !== skill.name);
+                        } else {
+                            this.errorMessage = response.data.data?.errors?.[0] ?? 'Произошла ошибка на сервере';
+                        }
+                    })
+                    .catch(error => {
+                        this.errorMessage = apiErrorHandle(error, 'Произошла ошибка при удалении навыка')
+                    });
+            },
+            showConfirmDelete(skill) {
+                this.hideAllConfirmations();
+                skill.confirmingDelete = true;
+
+                setTimeout(() => {
+                    document.addEventListener('click', this.handleClickOutside);
+                }, 10);
+            },
+            hideAllConfirmations() {
+                this.skills.forEach(s => {
+                    s.confirmingDelete = false;
+                });
+                document.removeEventListener('click', this.handleClickOutside);
+            },
+            handleClickOutside(event) {
+                // Проверяем, был ли клик вне области подтверждения
+                const confirmElements = document.querySelectorAll('.confirm-delete');
+                let clickedInside = false;
+
+                confirmElements.forEach(element => {
+                    if (element.contains(event.target)) {
+                        clickedInside = true;
+                    }
+                });
+
+                if (!clickedInside) {
+                    this.hideAllConfirmations();
+                }
+            },
+            confirmDelete(skill) {
+                this.removeSkill(skill);
+                this.hideAllConfirmations();
+            },
+            cancelDelete(skill) {
+                this.hideAllConfirmations();
+            },
+            clearForm() {
+                this.newSkillName = '';
+                this.newSkillDescr = '';
+                this.errorMessage = '';
+                this.hideAllConfirmations();
+            },
+            checkDuplicate(skillName) {
+                let trimmedName = skillName.trim();
+                if (!trimmedName) {
+                    this.errorMessage = '';
+                    return;
+                }
+                this.isDuplicateError = this.skills.some(skill =>
+                    skill.name.toLowerCase() === trimmedName.toLowerCase()
+                );
+                this.errorMessage =  this.isDuplicateError ? 'Навык с таким названием уже существует' : '';
             }
-        }).mount('#vue-app');
-    </script>
+        },
+        mounted() {
+            let url = 'http://localhost:8080/api/skill/get-all';
+            axios.get(url)
+                .then(response => {
+                    this.skills = response.data.data || [];
+                    this.loading = false;
+                })
+                .catch(error => {
+                    this.errorMessage = apiErrorHandle(error, 'Ошибка загрузки данных')
+                    this.loading = false;
+                });
+        },
+        beforeUnmount() {
+            // Убираем обработчик при уничтожении компонента
+            document.removeEventListener('click', this.handleClickOutside);
+        }
+    }).mount('#vue-app');
+</script>
 {% endblock %}

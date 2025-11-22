@@ -1,5 +1,3 @@
-
-
 .skill-card {
     transition: all 0.3s ease;
     min-height: 400px;
@@ -9,9 +7,12 @@
 }
 
 .skill-item {
+    position: relative;
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 8px;
-    padding: 12px 15px;
+    padding: 12px;
+    padding-right: 8px;
+    padding-left: 17px;
     border: 1px solid #dee2e6;
     transition: all 0.2s ease;
     height: 100%;
@@ -20,7 +21,6 @@
 .skill-item:hover {
     background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
     border-color: #0d6efd;
-    transform: translateY(-1px);
 }
 
 .skill-text {
@@ -54,4 +54,66 @@
     .skill-item {
         margin-bottom: 10px;
     }
+}
+
+
+/* Подсветка дубликата */
+.skill-duplicate {
+    border: 1px solid #ebd366 !important;
+    background: #ffffe5;
+}
+/* Анимация моргания */
+.duplicate-blink {
+    animation: duplicateBlink 1s ease-in-out 5;
+}
+@keyframes duplicateBlink {
+    0%, 100% {
+
+        box-shadow: 0 0 3px rgba(220, 195, 53, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 7px rgba(220, 187, 53, 0.7);
+    }
+}
+
+.btn-remove-tiny {
+    width: 19px;
+    height: 19px;
+    border: 1px solid #dc3545;
+    border-radius: 3px;
+    background: white;
+    color: #dc3545;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    padding: 0;
+}
+
+.btn-remove-tiny:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.confirm-delete {
+    /*opacity: 0.5;*/
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 6px;
+    padding: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 10;
+    white-space: nowrap;
+    background: white;
+}
+.confirm-delete b {
+    font-size: 14px;
+}
+
+.confirm-delete .btn {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    margin: 0 2px;
 }
