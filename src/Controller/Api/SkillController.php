@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Dto\Input\SkillRequestDto;
 use App\Entity\Skill;
 use App\Service\SkillService;
+use App\Validator\ValidateCsrfToken;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
@@ -29,6 +30,7 @@ class SkillController extends BaseController
     }
 
     #[Route('/create', name: 'api_skill_new', methods: ['POST'], format: 'json')]
+    #[ValidateCsrfToken]
     public function create(#[MapRequestPayload] SkillRequestDto $skillRequestDto): JsonResponse
     {
         $skill = $this->skillService->createSkill($skillRequestDto);
@@ -37,6 +39,7 @@ class SkillController extends BaseController
     }
 
     #[Route('/delete/{name}', name: 'api_skill_delete', requirements: ['name' => '.+'],  methods: ['POST'], format: 'json')]
+    #[ValidateCsrfToken]
     public function delete(Skill $skill): JsonResponse
     {
         if (!$skill) {

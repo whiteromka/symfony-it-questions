@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
+    <meta name="csrf-token" content="{{ csrf_token('authenticate') }}">
     <title>{% block title %}Welcome!{% endblock %}</title>
 
     <!-- Стили -->
@@ -70,14 +71,12 @@
 
     <!-- Контент -->
     <div id="layoutSidenav_content">
-        <main>
-            <div class="main-wrap-content">
-                {% set fullWidthRoutes = ['question_show', 'question_random'] %}
-                <div class="{{ app.request.get('_route') in fullWidthRoutes ? '' : 'container-fluid' }}">
-                {% block body %}{% endblock %}
-                </div>
+        <div class="main-wrap-content">
+            {% set fullWidthRoutes = ['question_show', 'question_random'] %}
+            <div class="{{ app.request.get('_route') in fullWidthRoutes ? '' : 'container-fluid' }}">
+            {% block body %}{% endblock %}
             </div>
-        </main>
+        </div>
     </div>
 </div>
 

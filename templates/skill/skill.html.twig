@@ -17,12 +17,12 @@
                 <!-- Левая колонка - Список навыков -->
                 <div class="col-lg-8 mb-4">
                     <div class="card shadow-sm skill-card">
-                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <div class="card-header bg-warning d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">
-                                <i class="fas fa-list-check text-primary me-2"></i>
+                                <i class="fas fa-list-check text-dark me-2"></i>
                                 Список навыков
                             </h5>
-                            <span class="badge bg-primary rounded-pill" v-text="skills.length"></span>
+                            <span class="badge bg-dark text-white rounded-pill" v-text="skills.length"></span>
                         </div>
                         <div class="card-body">
 
@@ -36,7 +36,7 @@
                             <!-- Список навыков в 3 колонки -->
                             <div v-else class="row">
                                 <div v-for="(skill, index) in skills" :key="skill.id" class="col-md-4 mb-3">
-                                    <div class="skill-item h-100">
+                                    <div class="skill-item h-75">
                                         <div class="d-flex align-items-center justify-content-between h-100">
                                             <div class="d-flex align-items-center">
                                                 <i class="fas fa-tag text-muted me-2"></i>
@@ -68,10 +68,9 @@
 
                 <!-- Правая колонка - Добавление навыка -->
                 <div class="col-lg-4 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-white">
+                    <div class="card shadow-sm skill-form">
+                        <div class="card-header bg-warning">
                             <h5 class="card-title mb-0">
-                                <i class="fas fa-plus-circle text-success me-2"></i>
                                 Добавить навык
                             </h5>
                         </div>
@@ -79,62 +78,46 @@
                             <form @submit.prevent="addSkill()">
                                 <div class="mb-3">
                                     <label for="skillInput" class="form-label">Название навыка</label>
-                                    <input
-                                            type="text"
-                                            class="form-control"
-                                            id="skillInput"
-                                            v-model="newSkillName"
-                                            placeholder="Введите название навыка..."
-                                            required
+                                    <input type="text" class="form-control" id="skillInput" maxlength="30" placeholder="Введите название навыка..." required
+                                           v-model="newSkillName"
                                     >
-                                    <div class="form-text">
-                                        Например: JavaScript, PHP, Project Management...
+                                    <div class="form-text">Например: JavaScript, PHP, Project Management...</div>
+                                    <div class="text-success mb-0"
+                                        :class="lengthColor"
+                                        v-text="'Символов: ' + displayLength  + '/30'">
                                     </div>
                                 </div>
 
-                                <div class="d-grid gap-2">
-                                    <button
-                                            type="submit"
-                                            class="btn btn-success btn-add"
-                                            :disabled="!newSkillName.trim()"
-                                    >
-                                        <i class="fas fa-plus me-1"></i>Добавить навык
-                                    </button>
-                                    <button
-                                            type="button"
-                                            class="btn btn-outline-secondary"
-                                            @click="clearForm"
-                                    >
-                                        <i class="fas fa-eraser me-1"></i>Очистить
-                                    </button>
+                                <div class="row g-2">
+                                    <div class="col-12 col-xl-6">
+                                        <button type="submit" class="btn btn-success btn-add w-100"
+                                                :disabled="!newSkillName.trim()"
+                                        >
+                                            <i class="fas fa-plus me-1"></i>Добавить
+                                        </button>
+                                    </div>
+                                    <div class="col-12 col-xl-6">
+                                        <button type="button" class="btn btn-outline-secondary w-100"
+                                                @click="clearForm"
+                                        >
+                                            <i class="fas fa-eraser me-1"></i>Очистить
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
-                        </div>
-                    </div>
+                            <br><br>
 
-                    <!-- Статистика -->
-                    <div class="card mt-4 shadow-sm">
-                        <div class="card-body">
-                            <h6 class="card-title mb-3">
-                                <i class="fas fa-chart-bar text-info me-2"></i>
-                                Статистика
-                            </h6>
+                            <!-- Статистика -->
                             <div class="row text-center">
                                 <div class="col-6 mb-2">
                                     <div class="border-end pe-2">
-                                        <h4 class="text-primary mb-0" v-text="skills.length"></h4>
-                                        <small class="text-muted">Всего навыков</small>
+                                        <small class="text-muted">Навыков: <b v-text="skills.length"></b></small>
                                     </div>
-                                </div>
-                                <div class="col-6 mb-2">
-                                    <h4 class="text-success mb-0" v-text="newSkillName.length"></h4>
-                                    <small class="text-muted">Символов</small>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
             <!-- Сообщения об ошибках -->
             <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
@@ -152,7 +135,9 @@
     <script src="{{ asset('js/Vue.3.5.24.js') }}"></script>
 
     <script type="module">
-        import { apiErrorHandle } from "{{ asset('js/common/apiErrorHandle.js') }}"
+        import { apiErrorHandle, getCsrfToken } from "{{ asset('js/common/formHelper.js') }}"
+
+        axios.defaults.headers.common['X-CSRF-TOKEN'] = getCsrfToken();
 
         Vue.createApp({
             data() {
@@ -163,6 +148,17 @@
 
                     errorMessage: '',
                     loading: true
+                }
+            },
+            computed: {
+                displayLength() {
+                    return Math.min(this.newSkillName.length, 30);
+                },
+                lengthColor() {
+                    const length = this.newSkillName.length;
+                    if (length >= 23) return 'text-danger';
+                    if (length >= 15) return 'text-warning';
+                    return 'text-success';
                 }
             },
             methods: {

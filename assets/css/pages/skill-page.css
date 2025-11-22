@@ -1,6 +1,11 @@
+
+
 .skill-card {
     transition: all 0.3s ease;
-    border-left: 4px solid #0d6efd;
+    min-height: 400px;
+}
+.skill-form {
+    min-height: 400px;
 }
 
 .skill-item {
@@ -31,7 +36,6 @@
 
 .btn-add:hover {
     background: linear-gradient(135deg, #0a58ca 0%, #084298 100%);
-    transform: translateY(-1px);
 }
 
 .empty-state {
