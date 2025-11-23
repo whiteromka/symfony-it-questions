@@ -24,6 +24,9 @@ security:
             logout:
                 path: app_logout
 
+            custom_authenticators:
+                - App\Security\GoogleAuthenticator
+
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }           # В /admin - только админы
         - { path: ^/login, roles: PUBLIC_ACCESS }        # /login - всем доступно
