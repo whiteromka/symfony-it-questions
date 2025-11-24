@@ -26,6 +26,7 @@ security:
 
             custom_authenticators:
                 - App\Security\GoogleAuthenticator
+                - App\Security\YandexAuthenticator
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }           # В /admin - только админы

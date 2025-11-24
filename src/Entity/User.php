@@ -68,6 +68,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $googleId = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $yandexId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -244,6 +247,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setGoogleId(?string $googleId): static
     {
         $this->googleId = $googleId;
+        return $this;
+    }
+
+    public function getYandexId(): ?string
+    {
+        return $this->yandexId;
+    }
+
+    public function setYandexId(?string $yandexId): static
+    {
+        $this->yandexId = $yandexId;
         return $this;
     }
 }
