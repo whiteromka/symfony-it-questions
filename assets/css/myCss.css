@@ -11,3 +11,36 @@ div.nav a.active_link .sb-nav-link-icon{color: #00ff88 !important;}
     margin-right: 1rem !important;
     padding-right: 25px;
 }
+
+/* Иконки входа через соц сети */
+.social-btn {
+    width: 40px;
+    height: 40px;
+    background: #e9e9e9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border: 4px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.social-btn i {
+    color: black;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.social-btn:hover {
+    background: #e3f2fd;
+    border-color: #bad5ee;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+.yandex-btn:hover {
+    background: #fde3e3;
+    border-color: #eebaba;
+    box-shadow: 0 0 0 2px rgba(243, 64, 33, 0.1);
+}

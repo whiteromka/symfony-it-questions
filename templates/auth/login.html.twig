@@ -35,13 +35,15 @@
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-4">
                 <div class="mt-4">
-                    <p>Или используйте для входа один из сервисов ниже:</p>
-                    <a href="{{ path('connect_google_start') }}" class="btn btn-danger">
-                        <i class="fab fa-google"></i> Google
-                    </a>
-                    <a href="{{ path('connect_yandex_start') }}" class="btn btn-warning" style="background-color: #FFCC00; color: #000;">
-                        <i class="fab fa-yandex"></i> Yandex
-                    </a>
+                    <p class="text-center mb-3">Или используйте для входа один из сервисов ниже:</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ path('connect_google_start') }}" class="social-btn google-btn">
+                            <i class="fab fa-google"></i>
+                        </a>
+                        <a href="{{ path('connect_yandex_start') }}" class="social-btn yandex-btn">
+                            <i class="fab fa-yandex" style="color: red"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
