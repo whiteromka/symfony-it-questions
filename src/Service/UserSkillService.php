@@ -4,25 +4,43 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Entity\Skill;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserSkillService
 {
     public function __construct(
+        private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager
     ) {}
 
     /**
+     * Найти всех с навыками
      * @return array []
      */
     public function findAllWithSkills(): array
     {
-        return $this->entityManager->getRepository(User::class)
+        return $this->userRepository
             ->createQueryBuilder('u')
             ->leftJoin('u.skills', 's')
             ->addSelect('s')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Найти одного с навыками
+     */
+    public function findWithSkills(int $id): ?User
+    {
+        return $this->userRepository
+            ->createQueryBuilder('u')
+            ->leftJoin('u.skills', 's')
+            ->addSelect('s')
+            ->where('u.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /** Прикрепить навык к польз-лю */
@@ -33,7 +51,7 @@ class UserSkillService
         }
 
         $user->addSkill($skill);
-        $this->entityManager->flush();
+        $this->userRepository->flush();
         return true;
     }
 

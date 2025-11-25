@@ -24,13 +24,14 @@ class UserController extends BaseController
     public function all(): JsonResponse
     {
         $users = $this->userSkillService->findAllWithSkills();
-        $data = array_map(fn($user) => $this->entityToArray($user), $users);
+        $data = array_map(fn(User $user) => $this->entityToArray($user), $users);
         return $this->setJsonResponse(true, [], $data);
     }
 
     #[Route('/get/{id}', name: 'api_user_get', requirements: ['id' => '\d+'], defaults: ['id' => 2],  methods: ['GET'], format: 'json')]
-    public function get(User $user = null): JsonResponse
+    public function get(int $id): JsonResponse
     {
+        $user = $this->userSkillService->findWithSkills($id);
         if (!$user) {
             return $this->setJsonResponse(false, ['Пользователь не найден'], [], 404);
         }
@@ -39,8 +40,9 @@ class UserController extends BaseController
     }
 
     #[Route('/get-email/{id}', name: 'api_user_get_email',  requirements: ['id' => '\d+'], methods: ['GET'], format: 'json')]
-    public function getEmail(User $user = null): JsonResponse
+    public function getEmail(int $id): JsonResponse
     {
+        $user = $this->userSkillService->findWithSkills($id);
         if (!$user) {
             return $this->setJsonResponse(false, ['Пользователь не найден'], [], 404);
         }
@@ -53,8 +55,12 @@ class UserController extends BaseController
         requirements: ['userId' => '\d+', 'skillId' => '\d+'],
         methods: ['POST'],
         format: 'json')]
-    public function attachSkill(User $user, Skill $skill): JsonResponse
+    public function attachSkill(int $userId, Skill $skill): JsonResponse
     {
+        $user = $this->userSkillService->findWithSkills($userId);
+        if (!$user) {
+            return $this->setJsonResponse(false, ['Пользователь не найден'], [], 404);
+        }
         if (!$this->userSkillService->attachSkillToUser($user, $skill)) {
             return $this->setJsonResponse(false, ['Навык уже прикреплен к пользователю'], [], 200);
         }
@@ -72,8 +78,12 @@ class UserController extends BaseController
         requirements: ['userId' => '\d+', 'skillId' => '\d+'],
         methods: ['POST'],
         format: 'json')]
-    public function detachSkill(User $user, Skill $skill): JsonResponse
+    public function detachSkill(int $userId, Skill $skill): JsonResponse
     {
+        $user = $this->userSkillService->findWithSkills($userId);
+        if (!$user) {
+            return $this->setJsonResponse(false, ['Пользователь не найден'], [], 404);
+        }
         if (!$this->userSkillService->detachSkillFromUser($user, $skill)) {
             return $this->setJsonResponse(false, ['Навык не прикреплен к пользователю'], [], 200);
         }
@@ -86,8 +96,9 @@ class UserController extends BaseController
     }
 
     #[Route('/skills/{id}', name: 'api_user_skills',  requirements: ['id' => '\d+'], methods: ['GET'], format: 'json')]
-    public function getUserSkills(User $user = null): JsonResponse
+    public function getUserSkills(int $id): JsonResponse
     {
+        $user = $this->userSkillService->findWithSkills($id);
         if (!$user) {
             return $this->setJsonResponse(false, ['Пользователь не найден'], [], 404);
         }
