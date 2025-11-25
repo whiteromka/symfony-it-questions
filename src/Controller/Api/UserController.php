@@ -3,8 +3,9 @@
 namespace App\Controller\Api;
 
 use App\Entity\User;
-use App\Service\QuestionService;
-use App\Service\UserService;
+use App\Entity\Skill;
+use App\Service\UserSkillService;
+use App\Validator\ValidateCsrfToken;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -13,7 +14,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 class UserController extends BaseController
 {
     public function __construct(
-        private readonly UserService $userService,
+        private readonly UserSkillService $userSkillService,
         SerializerInterface $serializer
     ) {
         parent::__construct($serializer);
@@ -22,8 +23,8 @@ class UserController extends BaseController
     #[Route('/get-all', name: 'api_user_all', methods: ['GET'], format: 'json')]
     public function all(): JsonResponse
     {
-        $users = $this->userService->findAll();
-        $data = array_map(fn($question) => $this->entityToArray($question), $users);
+        $users = $this->userSkillService->findAllWithSkills();
+        $data = array_map(fn($user) => $this->entityToArray($user), $users);
         return $this->setJsonResponse(true, [], $data);
     }
 
@@ -37,7 +38,7 @@ class UserController extends BaseController
         return $this->setJsonResponse(true, [], $data);
     }
 
-    #[Route('/get-email/{id}', name: 'api_user_get_email', methods: ['GET'], format: 'json')]
+    #[Route('/get-email/{id}', name: 'api_user_get_email',  requirements: ['id' => '\d+'], methods: ['GET'], format: 'json')]
     public function getEmail(User $user = null): JsonResponse
     {
         if (!$user) {
@@ -46,8 +47,75 @@ class UserController extends BaseController
         return $this->setJsonResponse(true, [], ['email' => $user->getEmail()]);
     }
 
+    #[ValidateCsrfToken]
+    #[Route('/attach-skill/{userId}/{skillId}',
+        name: 'api_user_attach_skill',
+        requirements: ['userId' => '\d+', 'skillId' => '\d+'],
+        methods: ['POST'],
+        format: 'json')]
+    public function attachSkill(User $user, Skill $skill): JsonResponse
+    {
+        if (!$this->userSkillService->attachSkillToUser($user, $skill)) {
+            return $this->setJsonResponse(false, ['Навык уже прикреплен к пользователю'], [], 200);
+        }
+
+        return $this->setJsonResponse(true, [], [
+            'user_id' => $user->getId(),
+            'skill_id' => $skill->getId(),
+            'skill_name' => $skill->getName()
+        ]);
+    }
+
+    #[ValidateCsrfToken]
+    #[Route('/detach-skill/{userId}/{skillId}',
+        name: 'api_user_detach_skill',
+        requirements: ['userId' => '\d+', 'skillId' => '\d+'],
+        methods: ['POST'],
+        format: 'json')]
+    public function detachSkill(User $user, Skill $skill): JsonResponse
+    {
+        if (!$this->userSkillService->detachSkillFromUser($user, $skill)) {
+            return $this->setJsonResponse(false, ['Навык не прикреплен к пользователю'], [], 200);
+        }
+
+        return $this->setJsonResponse(true, [], [
+            'user_id' => $user->getId(),
+            'skill_id' => $skill->getId(),
+            'skill_name' => $skill->getName()
+        ]);
+    }
+
+    #[Route('/skills/{id}', name: 'api_user_skills',  requirements: ['id' => '\d+'], methods: ['GET'], format: 'json')]
+    public function getUserSkills(User $user = null): JsonResponse
+    {
+        if (!$user) {
+            return $this->setJsonResponse(false, ['Пользователь не найден'], [], 404);
+        }
+
+        $skills = $user->getSkills()->map(function(Skill $skill) {
+            return [
+                'id' => $skill->getId(),
+                'name' => $skill->getName(),
+                'description' => $skill->getDescr()
+            ];
+        })->toArray();
+
+        return $this->setJsonResponse(true, [], [
+            'user_id' => $user->getId(),
+            'skills' => $skills
+        ]);
+    }
+
     private function entityToArray(User $user): array
     {
+        $skills = $user->getSkills()->map(function(Skill $skill) { // Навыки уже загружены жадной загрузкой
+            return [
+                'id' => $skill->getId(),
+                'name' => $skill->getName(),
+                'description' => $skill->getDescr()
+            ];
+        })->toArray();
+
         return [
             'id' => $user->getId(),
             'name' => $user->getName(),
@@ -56,6 +124,7 @@ class UserController extends BaseController
             'status' => $user->getStatus(),
             'phone' => $user->getPhone(),
             'roles' => $user->getRoles(),
+            'skills' => $skills,
             'createdAt' => $user->getCreatedAt()?->format('Y-m-d H:i:s'),
         ];
     }

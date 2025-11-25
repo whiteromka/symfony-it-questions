@@ -62,7 +62,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinTable(name: 'user_to_skill')]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'skill_id', referencedColumnName: 'id')]
-    #[ORM\ManyToMany(targetEntity: Skill::class, inversedBy: 'users')]
+    #[ORM\ManyToMany(targetEntity: Skill::class, inversedBy: 'users', fetch: 'EAGER')]
     private Collection $skills;
 
     #[ORM\Column(length: 255, nullable: true)]
