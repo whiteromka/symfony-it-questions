@@ -62,7 +62,7 @@ class GoogleAuthenticator extends OAuth2Authenticator
                     // Создаем нового пользователя
                     $user = $this->userService->newUser(
                         email: $email,
-                        firstName: $firstName,
+                        name: $firstName,
                         lastName: $lastName,
                     );
                     $user->setGoogleId($googleId);

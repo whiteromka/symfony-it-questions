@@ -66,7 +66,7 @@ class YandexAuthenticator extends AbstractAuthenticator
                     // Создаем нового пользователя
                     $user = $this->userService->newUser(
                         email: $email,
-                        firstName: $firstName,
+                        name: $firstName,
                         lastName: $lastName,
                     );
                     $user->setYandexId($yandexId);

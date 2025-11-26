@@ -206,7 +206,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeQuestion(Question $question): static
     {
         if ($this->questions->removeElement($question)) {
-            // set the owning side to null (unless already changed)
             if ($question->getAuthor() === $this) {
                 $question->setAuthor(null);
             }
@@ -237,6 +236,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->skills->removeElement($skill);
 
         return $this;
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string, description: string|null}>
+     */
+    public function getSkillsAsArray(): array
+    {
+        return $this->getSkills()->map(function(Skill $skill) {
+            return [
+                'id' => $skill->getId(),
+                'name' => $skill->getName(),
+                'description' => $skill->getDescr()
+            ];
+        })->toArray();
     }
 
     public function getGoogleId(): ?string

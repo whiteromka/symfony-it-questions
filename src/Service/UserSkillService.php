@@ -51,7 +51,7 @@ class UserSkillService
         }
 
         $user->addSkill($skill);
-        $this->userRepository->flush();
+        $this->entityManager->flush();
         return true;
     }
 
@@ -59,7 +59,7 @@ class UserSkillService
     public function detachSkillFromUser(User $user, Skill $skill): bool
     {
         if (!$user->getSkills()->contains($skill)) {
-            return false;
+            return true;
         }
 
         $user->removeSkill($skill);

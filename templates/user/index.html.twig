@@ -14,7 +14,8 @@
                 :users="users"
                 @add-user="addUser"
                 @remove-user="removeUser"
-                @add-skill-to-user="addSkillToUser"
+                @attach-skill="attachSkill"
+                @detach-skill="detachSkill"
             ></user-list>
         </div>
     </div>
@@ -30,44 +31,88 @@
         import { apiErrorHandle, getCsrfToken } from "{{ asset('js/common/formHelper.js') }}"
 
         axios.defaults.headers.common['X-CSRF-TOKEN'] = getCsrfToken();
+
         Vue.createApp({
             components: {
                 'user-list': UserList,
             },
             data() {
                 return {
-                    message: 'It is VUE',
                     users: [],
                     errorMessage: '',
                 }
             },
             methods: {
-                addUser(newUser) {
+                async loadUsers() {
+                    try {
+                        const response = await axios.get('/api/user/get-all');
+                        if (response.data.success) {
+                            this.users = response.data.data;
+                        } else {
+                            this.errorMessage = response.data.errors.join(', ');
+                        }
+                    } catch (error) {
+                        this.errorMessage = apiErrorHandle(error, 'Ошибка загрузки пользователей');
+                    }
+                },
+
+                async addUser(newUser) {
                     this.users.push(newUser);
                 },
-                removeUser(email) {
-                    this.users = this.users.filter(user => user.email !== email);
-                },
-                addSkillToUser(data) {
-                    const user = this.users.find(u => u.email === data.userEmail);
-                    if (user) {
-                        if (!user.skills) {
-                            user.skills = [];
+
+                async removeUser(userId) {
+                    try {
+                        const response = await axios.delete(`/api/user/delete/${userId}`);
+                        if (response.data.success) {
+                            this.users = this.users.filter(user => user.id !== userId);
+                        } else {
+                            this.errorMessage = response.data.errors.join(', ');
                         }
-                        user.skills.push(data.skill);
+                    } catch (error) {
+                        this.errorMessage = apiErrorHandle(error, 'Ошибка удаления пользователя');
+                    }
+                },
+
+                async attachSkill(data) {
+                    const targetUser = this.users.find(user => user.id === data.user_id);
+                    if (targetUser) {
+                        const newSkill = {
+                            id: data.skill_id,
+                            name: data.skill_name,
+                            descr: data.skill_descr
+                        };
+
+                        if (!targetUser.skills) {
+                            targetUser.skills = [];
+                        }
+
+                        const skillExists = targetUser.skills.some(skill => skill.id === data.skill_id);
+                        if (!skillExists) {
+                            targetUser.skills.push(newSkill);
+                        }
+                    }
+                },
+
+                async detachSkill(data) {
+                    try {
+                        const response = await axios.post(`/api/user/detach-skill/${data.userId}/${data.skillId}`);
+                        if (response.data.success) {
+                            const targetUser = this.users.find(user => user.id === data.userId);
+                            if (targetUser?.skills) {
+                                targetUser.skills = targetUser.skills.filter(skill => skill.id !== data.skillId);
+                            }
+                        } else {
+                            this.errorMessage = response.data.errors.join(', ');
+                        }
+                    } catch (error) {
+                        this.errorMessage = apiErrorHandle(error, 'Ошибка открепления навыка');
                     }
                 }
             },
             mounted() {
-                let url = 'http://localhost:8080/api/user/get-all'
-                axios.get(url)
-                    .then(res => {
-                        this.users = res.data.data
-                    })
-                    .catch(error => {
-                        this.errorMessage = apiErrorHandle(error, 'Ошибка загрузки данных')
-                    });
+                this.loadUsers();
             }
         }).mount('#vue-app');
     </script>
+
 {% endblock %}
