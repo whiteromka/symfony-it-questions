@@ -12,8 +12,9 @@
             <h1 class="mt-4 mb-0">Управление навыками</h1>
         </div>
 
-        <div id="vue-app">
+        <div id="vue-app" v-cloak>
             <div class="row">
+
                 <!-- Левая колонка - Список навыков -->
                 <div class="col-lg-8 mb-4">
                     <div class="card shadow-sm skill-card">
@@ -61,7 +62,7 @@
                                                             class="btn btn-sm btn-danger"
                                                         >Да</button>
                                                         <button
-                                                            @click="cancelDelete(skill)"
+                                                            @click="cancelDelete()"
                                                             class="btn btn-sm btn-secondary ms-1"
                                                         >Нет</button>
                                                     </div>
@@ -137,7 +138,7 @@
                             <br><br>
 
                             <!-- Сообщения об ошибках -->
-                            <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                            <div v-if="errorMessage.length > 0" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
                                 <span v-text="errorMessage"></span>
                                 <button type="button" class="btn-close" @click="errorMessage = ''"></button>
@@ -146,6 +147,7 @@
                     </div>
                 </div>
 
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -154,158 +156,120 @@
     <script src="{{ asset('js/Axios1.13.2.js') }}"></script>
     <script src="{{ asset('js/Vue.3.5.24.js') }}"></script>
 
-<script type="module">
-    import { apiErrorHandle, getCsrfToken } from "{{ asset('js/common/formHelper.js') }}"
+    <script type="module">
+        import { getCsrfToken } from "{{ asset('js/common/formHelper.js') }}"
+        import { skillService } from "{{ asset('js/common/services/skillService.js') }}"
 
-    axios.defaults.headers.common['X-CSRF-TOKEN'] = getCsrfToken();
+        axios.defaults.headers.common['X-CSRF-TOKEN'] = getCsrfToken();
 
-    Vue.createApp({
-        data() {
-            return {
-                skills: [],
-                newSkillName: '',
-                newSkillDeskr: '',
-
-                errorMessage: '',
-                loading: true,
-
-                isDuplicateError: false
-            }
-        },
-        computed: {
-            displayLength() {
-                return Math.min(this.newSkillName.length, 30);
-            },
-            lengthColor() {
-                const length = this.newSkillName.length;
-                if (length >= 23) return 'text-danger';
-                if (length >= 15) return 'text-warning';
-                return 'text-success';
-            }
-        },
-        watch: {
-            newSkillName(newValue) {
-                this.checkDuplicate(newValue);
-            },
-            skills() {
-                this.checkDuplicate(this.newSkillName);
-            }
-        },
-        methods: {
-            addSkill() {
-                if (!this.newSkillName.trim()) {
-                    this.errorMessage = 'Пожалуйста, введите название навыка';
-                    return;
-                }
-                let isDuplicate = this.skills.find(skill => skill.name === this.newSkillName.trim());
-                if (isDuplicate) {
-                    this.errorMessage = 'Навык с таким названием уже существует';
-                    return;
-                }
-
-                let newSkillObj = {
-                    id: Date.now(),
-                    name: this.newSkillName.trim(),
-                    descr: this.newSkillDeskr?.trim() || ''
-                };
-
-                axios.post('http://localhost:8080/api/skill/create', newSkillObj)
-                    .then(response => {
-                        if (response.data.success) {
-                            this.skills.push(newSkillObj);
-                            this.clearForm()
-                        } else {
-                            this.errorMessage = response.data.data?.errors?.[0] ?? 'Произошла ошибка на сервере';
-                        }
-                    })
-                    .catch(error => {
-                        this.errorMessage = apiErrorHandle(error, 'Произошла ошибка при добавлении навыка')
-                    });
-            },
-            removeSkill(skill) {
-                let url = 'http://localhost:8080/api/skill/delete/' + skill.name;
-                axios.post(url)
-                    .then(response => {
-                        if (response.data.success) {
-                            this.skills = this.skills.filter(s => s.name !== skill.name);
-                        } else {
-                            this.errorMessage = response.data.data?.errors?.[0] ?? 'Произошла ошибка на сервере';
-                        }
-                    })
-                    .catch(error => {
-                        this.errorMessage = apiErrorHandle(error, 'Произошла ошибка при удалении навыка')
-                    });
-            },
-            showConfirmDelete(skill) {
-                this.hideAllConfirmations();
-                skill.confirmingDelete = true;
-
-                setTimeout(() => {
-                    document.addEventListener('click', this.handleClickOutside);
-                }, 10);
-            },
-            hideAllConfirmations() {
-                this.skills.forEach(s => {
-                    s.confirmingDelete = false;
-                });
-                document.removeEventListener('click', this.handleClickOutside);
-            },
-            handleClickOutside(event) {
-                // Проверяем, был ли клик вне области подтверждения
-                const confirmElements = document.querySelectorAll('.confirm-delete');
-                let clickedInside = false;
-
-                confirmElements.forEach(element => {
-                    if (element.contains(event.target)) {
-                        clickedInside = true;
-                    }
-                });
-
-                if (!clickedInside) {
-                    this.hideAllConfirmations();
+        Vue.createApp({
+            data() {
+                return {
+                    skills: [],
+                    newSkillName: '',
+                    newSkillDescr : '',
+                    errorMessage: '',
+                    loading: true,
+                    isDuplicateError: false,
                 }
             },
-            confirmDelete(skill) {
-                this.removeSkill(skill);
-                this.hideAllConfirmations();
+            computed: {
+                displayLength() {
+                    return Math.min(this.newSkillName.length, 30)
+                },
+                lengthColor() {
+                    const length = this.newSkillName.length
+                    if (length >= 23) return 'text-danger'
+                    if (length >= 15) return 'text-warning'
+                    return 'text-success'
+                }
             },
-            cancelDelete(skill) {
-                this.hideAllConfirmations();
+            watch: {
+                newSkillName(newValue) {
+                    this.checkDuplicate(newValue)
+                },
+                skills() {
+                    this.checkDuplicate(this.newSkillName)
+                }
             },
-            clearForm() {
-                this.newSkillName = '';
-                this.newSkillDescr = '';
-                this.errorMessage = '';
-                this.hideAllConfirmations();
-            },
-            checkDuplicate(skillName) {
-                let trimmedName = skillName.trim();
-                if (!trimmedName) {
+            methods: {
+                async addSkill() {
                     this.errorMessage = '';
-                    return;
+                    const newSkill = {
+                        id: Date.now(),
+                        name: this.newSkillName.trim(),
+                        descr: this.newSkillDescr ?.trim() || ''
+                    }
+                    if (await skillService.add(newSkill)) {
+                        this.skills.push(newSkill)
+                        this.clearForm()
+                    } else {
+                        this.errorMessage = skillService.getError()
+                    }
+                },
+                async removeSkill(skill) {
+                    this.errorMessage = ''
+                    if (await skillService.remove(skill.name)) {
+                        this.skills = this.skills.filter(s => s.name !== skill.name)
+                    } else {
+                        this.errorMessage = skillService.getError()
+                    }
+                },
+                async loadSkills() {
+                    this.errorMessage = ''
+                    this.skills = await skillService.loadSkills()
+                    this.errorMessage = skillService.getError() || ''
+                },
+                showConfirmDelete(skill) {
+                    this.hideAllConfirmations()
+                    skill.confirmingDelete = true
+                    setTimeout(() => {
+                        document.addEventListener('click', this.handleClickOutside)
+                    }, 10)
+                },
+                hideAllConfirmations() {
+                    this.skills.forEach(s => {
+                        s.confirmingDelete = false
+                    })
+                    document.removeEventListener('click', this.handleClickOutside)
+                },
+                handleClickOutside(event) {
+                    // Проверяем, был ли клик внутри области подтверждения
+                    const confirmElements = document.querySelectorAll('.confirm-delete')
+                    const clickedInside = Array.from(confirmElements).some(el =>
+                        el.contains(event.target)
+                    )
+                    if (!clickedInside) this.hideAllConfirmations()
+                },
+                confirmDelete(skill) {
+                    this.removeSkill(skill)
+                    this.hideAllConfirmations()
+                },
+                cancelDelete() {
+                    this.hideAllConfirmations()
+                },
+                clearForm() {
+                    this.newSkillName = ''
+                    this.newSkillDescr = ''
+                    this.errorMessage = ''
+                    this.hideAllConfirmations()
+                },
+                checkDuplicate(skillName) {
+                    let trimmedName = skillName.trim()
+                    if (!trimmedName) return;
+                    this.isDuplicateError = this.skills.some(skill =>
+                        skill.name.toLowerCase() === trimmedName.toLowerCase()
+                    )
+                    this.errorMessage =  this.isDuplicateError ? 'Навык с таким названием уже существует' : ''
                 }
-                this.isDuplicateError = this.skills.some(skill =>
-                    skill.name.toLowerCase() === trimmedName.toLowerCase()
-                );
-                this.errorMessage =  this.isDuplicateError ? 'Навык с таким названием уже существует' : '';
-            }
-        },
-        mounted() {
-            let url = 'http://localhost:8080/api/skill/get-all';
-            axios.get(url)
-                .then(response => {
-                    this.skills = response.data.data || [];
-                    this.loading = false;
-                })
-                .catch(error => {
-                    this.errorMessage = apiErrorHandle(error, 'Ошибка загрузки данных')
-                    this.loading = false;
-                });
-        },
-        beforeUnmount() {
-            // Убираем обработчик при уничтожении компонента
-            document.removeEventListener('click', this.handleClickOutside);
-        }
-    }).mount('#vue-app');
-</script>
+            },
+            beforeUnmount() {
+                document.removeEventListener('click', this.handleClickOutside); // Убираем обработчик при уничтожении компонента
+            },
+            mounted() {
+                this.loadSkills();
+                this.loading = false;
+            },
+        }).mount('#vue-app');
+    </script>
 {% endblock %}

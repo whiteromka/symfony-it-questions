@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Dto\Input\SkillRequestDto;
 use App\Entity\Skill;
-use App\Entity\User;
 use App\Repository\SkillRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -24,9 +23,11 @@ class SkillService
         return $this->skillRepository->findAll();
     }
 
-    /**
-     * @throws Exception
-     */
+    public function findByName(string $name): ?Skill
+    {
+        return $this->skillRepository->findOneBy(['name' => $name]);
+    }
+
     public function createSkill(SkillRequestDto $skillDto): ?Skill
     {
         $skill = new Skill();

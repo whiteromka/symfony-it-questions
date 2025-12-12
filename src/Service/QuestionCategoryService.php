@@ -10,9 +10,7 @@ class QuestionCategoryService
 {
     public function __construct(
         private readonly QuestionCategoryRepository $questionCategoryRepository
-    )
-    {
-    }
+    ) {}
 
     /**
      * Вернет сущность категории вопроса

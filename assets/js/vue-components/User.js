@@ -14,7 +14,8 @@ const User = {
                             <span v-for="skill in user.skills" :key="skill.id" 
                                   class="badge bg-success d-flex align-items-center">
                                 {{ skill.name }}
-                                <button @click="detachSkill(skill.id)" 
+                                 <!-- Кнопка удалить навык -->
+                                <button @click="detachSkill(skill.name)" 
                                         class="btn-close btn-close-white ms-1"
                                         style="font-size: 0.7rem;"></button>
                             </span>
@@ -48,10 +49,10 @@ const User = {
                 this.$emit('remove-user', this.user.id);
             }
         },
-        detachSkill(skillId) {
+        detachSkill(skillName) {
             this.$emit('detach-skill', {
                 userId: this.user.id,
-                skillId: skillId
+                skillName: skillName
             });
         }
     }

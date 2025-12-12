@@ -9,14 +9,137 @@
 {% block body %}
     <div class="container-fluid px-4">
         <h1 class="mt-4">Пользователи</h1>
-        <div id="vue-app">
-            <user-list
-                :users="users"
-                @add-user="addUser"
-                @remove-user="removeUser"
-                @attach-skill="attachSkill"
-                @detach-skill="detachSkill"
-            ></user-list>
+        <div id="vue-app" v-cloak>
+
+            <div class="user-list">
+                <div class="row">
+                    <!-- Список пользователей -->
+                    <div class="col-lg-7 mb-4">
+                        <div class="card shadow-sm skill-card">
+                            <div class="card-header bg-warning d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-users text-dark me-2"></i>
+                                    Список пользователей
+                                </h5>
+                                <span class="badge bg-dark text-white rounded-pill" v-text="users.length"></span>
+                            </div>
+                            <div class="card-body">
+                                <user
+                                        v-for="user in users" :key="user.id"
+                                        :user="user"
+                                        :selected-user="selectedUser"
+                                        @remove-user="removeUser"
+                                        @add-skill="wantAddSkill(user)"
+                                        @detach-skill="detachSkill"
+                                ></user>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Добавление пользователя/навыка -->
+                    <div class="col-lg-5 mb-4">
+                        <div class="card shadow-sm skill-form">
+                            <div class="card-header bg-warning">
+                                <h5 class="card-title mb-0">
+                                    Добавить пользователя/навык
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="btn-group w-100" role="group">
+                                    <button type="button" class="btn w-50"
+                                            :class="formMode==='user' ? 'btn-primary' : 'btn-outline-secondary'"
+                                            @click="formMode='user'">Пользователи</button>
+                                    <button type="button" class="btn w-50" :disabled="!selectedUser"
+                                            :class="formMode==='skill' ? 'btn-primary' : 'btn-outline-secondary'"
+                                            @click="formMode='skill'">Навыки</button>
+                                </div>
+
+                                <!-- Форма добавления пользователя -->
+                                <div v-if="formMode === 'user'" class="mt-3">
+                                    <h6>Добавить пользователя</h6>
+                                    <div class="mb-2">
+                                        <input
+                                                v-model="newUser.name"
+                                                type="text"
+                                                class="form-control mb-2"
+                                                placeholder="Имя"
+                                                required
+                                        >
+                                        <input
+                                                v-model="newUser.lastName"
+                                                type="text"
+                                                class="form-control mb-2"
+                                                placeholder="Фамилия"
+                                        >
+                                        <input
+                                                v-model="newUser.email"
+                                                type="email"
+                                                class="form-control mb-2"
+                                                placeholder="Email"
+                                                required
+                                        >
+                                        <input
+                                                v-model="newUser.phone"
+                                                type="text"
+                                                class="form-control mb-2"
+                                                placeholder="Телефон"
+                                        >
+                                        <button @click="addUser()" class="btn btn-success w-100" :disabled="!isUserFormValid">
+                                            Создать пользователя
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Форма работы с навыками -->
+                                <div v-else class="mt-3">
+                                    <h6 v-text="'Навыки для' + selectedUser?.name"></h6>
+
+                                    <!-- Создание нового навыка | Прикрепление существующего навыка -->
+                                    <div class="mb-3 position-relative">
+
+                                        <!-- Поле ввода навыка -->
+                                        <input
+                                                type="text"
+                                                class="form-control"
+                                                placeholder="Начните вводить навык..."
+                                                v-model="skillSearch"
+                                                @input="filterSkills()"
+                                        >
+                                        <!-- Список подсказок -->
+                                        <ul v-if="filteredSkills.length"
+                                            class="list-group position-absolute w-100 mt-1"
+                                            style="z-index: 1000; max-height: 200px; overflow-y: auto;"
+                                        >
+                                            <li
+                                                    v-for="skill in filteredSkills"
+                                                    :key="skill.id"
+                                                    class="list-group-item list-group-item-action"
+                                                    @click="selectSkill(skill)"
+                                                    v-text="skill.name"
+                                            ></li>
+                                        </ul>
+                                        <!-- Кнопка прикрепления -->
+                                        <button
+                                                class="btn btn-primary w-100 mt-2"
+                                                :disabled="!skillSearch"
+                                                @click="attachSkill"
+                                        >Прикрепить навык</button>
+                                    </div>
+                                </div>
+
+                                <!-- Сообщения об ошибках -->
+                                <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <span v-text="errorMessage"></span>
+                                    <button type="button" class="btn-close" @click="errorMessage = ''"></button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 {% endblock %}
@@ -28,84 +151,145 @@
     <script src="{{ asset('js/vue-components/UserList.js') }}"></script>
 
     <script type="module">
-        import { apiErrorHandle, getCsrfToken } from "{{ asset('js/common/formHelper.js') }}"
+        import { getCsrfToken } from "{{ asset('js/common/formHelper.js') }}"
+        import { userService} from "{{ asset('js/common/services/userService.js') }}"
+        import { skillService} from "{{ asset('js/common/services/skillService.js') }}"
 
         axios.defaults.headers.common['X-CSRF-TOKEN'] = getCsrfToken();
 
         Vue.createApp({
             components: {
-                'user-list': UserList,
+                'user': User
             },
             data() {
                 return {
+                    // Пользователи
                     users: [],
-                    errorMessage: '',
+                    selectedUser: null,
+                    formMode: 'user',
+                    newUser: {
+                        name: '',
+                        lastName: '',
+                        email: '',
+                        phone: '',
+                        status: 1,
+                        roles: ['ROLE_USER']
+                    },
+
+                    // Навыки
+                    newSkill: {
+                        name: '',
+                        descr: ''
+                    },
+                    skillSearch: '',
+                    filteredSkills: [],
+                    availableSkills: [],
+                    selectedSkillName: '',
+
+                    errorMessage: ''
+                }
+            },
+            computed: {
+                isUserFormValid() {
+                    return this.newUser.name.trim() && this.newUser.email.trim();
+                }
+            },
+            watch: {
+                formMode(newMode) {
+                    if (newMode === 'skill' && this.selectedUser) {
+                        this.loadAvailableSkills();
+                    }
                 }
             },
             methods: {
-                async loadUsers() {
-                    try {
-                        const response = await axios.get('/api/user/get-all');
-                        if (response.data.success) {
-                            this.users = response.data.data;
-                        } else {
-                            this.errorMessage = response.data.errors.join(', ');
-                        }
-                    } catch (error) {
-                        this.errorMessage = apiErrorHandle(error, 'Ошибка загрузки пользователей');
+                filterSkills() {
+                    const q = this.skillSearch.toLowerCase().trim()
+                    if (!q) {
+                        this.filteredSkills = []
+                        this.selectedSkillName = ''
+                        return
                     }
+                    this.filteredSkills = this.availableSkills.filter(skill =>
+                        skill.name.toLowerCase().includes(q)
+                    );
+                },
+                selectSkill(skill) {
+                    this.skillSearch = skill.name
+                    this.selectedSkillName = skill.name
+                    this.filteredSkills = []
+                },
+                wantAddSkill(user) {
+                    this.formMode = 'skill'
+                    this.selectedUser = user
                 },
 
-                async addUser(newUser) {
-                    this.users.push(newUser);
+                async loadUsers() {
+                    this.errorMessage = ''
+                    this.users = await userService.loadUsers()
+                    console.log(this.users)
+                    this.errorMessage = userService.getError()
+                },
+
+                async addUser() {
+                    const userData = await userService.add(this.newUser)
+                    if (userData.id) {
+                        this.newUser.id = userData.id
+                        this.users.push(this.newUser);
+                        this.newUser = { name: '', lastName: '', email: '', phone: '', status: 1, roles: ['ROLE_USER'] }
+                    } else {
+                        this.errorMessage = userService.getError()
+                    }
                 },
 
                 async removeUser(userId) {
-                    try {
-                        const response = await axios.delete(`/api/user/delete/${userId}`);
-                        if (response.data.success) {
-                            this.users = this.users.filter(user => user.id !== userId);
-                        } else {
-                            this.errorMessage = response.data.errors.join(', ');
-                        }
-                    } catch (error) {
-                        this.errorMessage = apiErrorHandle(error, 'Ошибка удаления пользователя');
+                    this.errorMessage = ''
+                    if (this.selectedUser && this.selectedUser.id === userId) {
+                        this.selectedUser = null
+                        this.formMode = 'user'
+                    }
+                    if (await userService.remove(userId)) {
+                        this.users = this.users.filter(user => user.id !== userId);
+                    } else {
+                        this.errorMessage = userService.getError()
                     }
                 },
 
-                async attachSkill(data) {
-                    const targetUser = this.users.find(user => user.id === data.user_id);
+                async loadAvailableSkills() {
+                    this.availableSkills = await skillService.loadSkills()
+                    this.errorMessage = skillService.getError()
+                },
+
+                async attachSkill() {
+                    const targetUser = this.users.find(user => user.id === this.selectedUser.id);
                     if (targetUser) {
-                        const newSkill = {
-                            id: data.skill_id,
-                            name: data.skill_name,
-                            descr: data.skill_descr
-                        };
-
-                        if (!targetUser.skills) {
-                            targetUser.skills = [];
-                        }
-
-                        const skillExists = targetUser.skills.some(skill => skill.id === data.skill_id);
-                        if (!skillExists) {
-                            targetUser.skills.push(newSkill);
+                        if (!targetUser.skills) targetUser.skills = [];
+                        const skillExistsInUser = targetUser.skills.some(skill => skill.name === this.skillSearch);
+                        if (!skillExistsInUser) {
+                            if (await userService.attachSkill({
+                                userId: this.selectedUser.id,
+                                skillName: this.skillSearch
+                            })) {
+                                targetUser.skills.push({
+                                    id: this.skillSearch,
+                                    name: this.skillSearch,
+                                });
+                            } else {
+                                this.errorMessage = userService.getError()
+                            }
+                        } else {
+                            this.errorMessage = `Навык ${this.skillSearch} уже прикреплен к этому пользователю`
                         }
                     }
                 },
 
                 async detachSkill(data) {
-                    try {
-                        const response = await axios.post(`/api/user/detach-skill/${data.userId}/${data.skillId}`);
-                        if (response.data.success) {
-                            const targetUser = this.users.find(user => user.id === data.userId);
-                            if (targetUser?.skills) {
-                                targetUser.skills = targetUser.skills.filter(skill => skill.id !== data.skillId);
-                            }
-                        } else {
-                            this.errorMessage = response.data.errors.join(', ');
+                    if (await userService.detachSkill(data)) {
+                        const targetUser = this.users.find(user => user.id === data.userId);
+                        if (targetUser?.skills) {
+                            targetUser.skills = targetUser.skills.filter(skill => skill.name !== data.skillName);
                         }
-                    } catch (error) {
-                        this.errorMessage = apiErrorHandle(error, 'Ошибка открепления навыка');
+                    } else {
+                        this.errorMessage = userService.getError()
                     }
                 }
             },

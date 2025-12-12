@@ -44,3 +44,8 @@ div.nav a.active_link .sb-nav-link-icon{color: #00ff88 !important;}
     border-color: #eebaba;
     box-shadow: 0 0 0 2px rgba(243, 64, 33, 0.1);
 }
+
+/* Для Vue */
+[v-cloak] {
+    display: none !important;
+}

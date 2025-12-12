@@ -2,14 +2,15 @@
 
 namespace App\Controller\Api;
 
+use App\Dto\Input\SkillRequestDto;
 use App\Dto\Input\UserCreateDto;
 use App\Entity\User;
-use App\Entity\Skill;
+use App\Service\SkillService;
+use App\Service\UserQuestionService;
 use App\Service\UserService;
 use App\Service\UserSkillService;
 use App\Validator\ValidateCsrfToken;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,7 +21,9 @@ class UserController extends BaseController
 {
     public function __construct(
         private readonly UserSkillService $userSkillService,
+        private readonly UserQuestionService $userQuestionService,
         private readonly UserService $userService,
+        private readonly SkillService $skillService,
         private readonly EntityManagerInterface $entityManager,
         SerializerInterface $serializer
     ) {
@@ -35,8 +38,8 @@ class UserController extends BaseController
         return $this->setJsonResponse(true, [], $data);
     }
 
-    #[Route('/get/{id}', name: 'api_user_get', requirements: ['id' => '\d+'], defaults: ['id' => 2],  methods: ['GET'], format: 'json')]
-    public function get(int $id): JsonResponse
+    #[Route('/get/{id}', name: 'api_user_get', requirements: ['id' => '\d+'], methods: ['GET'], format: 'json')]
+    public function getUserById(int $id): JsonResponse
     {
         $user = $this->userSkillService->findWithSkills($id);
         if (!$user) {
@@ -47,9 +50,9 @@ class UserController extends BaseController
     }
 
     #[Route('/get-email/{id}', name: 'api_user_get_email',  requirements: ['id' => '\d+'], methods: ['GET'], format: 'json')]
-    public function getEmail(int $id): JsonResponse
+    public function getEmailById(int $id): JsonResponse
     {
-        $user = $this->userSkillService->findWithSkills($id);
+        $user = $this->userSkillService->find($id);
         if (!$user) {
             return $this->setJsonResponse(false, ['Пользователь не найден'], [], 404);
         }
@@ -57,51 +60,49 @@ class UserController extends BaseController
     }
 
     #[ValidateCsrfToken]
-    #[Route('/attach-skill/{userId}/{skillId}',
+    #[Route('/attach-skill/{userId}/{skillName}',
         name: 'api_user_attach_skill',
-        requirements: ['userId' => '\d+', 'skillId' => '\d+'],
+        requirements: ['userId' => '\d+', 'skillName' => '.+'],
         methods: ['POST'],
         format: 'json')]
     public function attachSkill(
         int $userId,
-        #[MapEntity(mapping: ['skillId' => 'id'])] Skill $skill
+        string $skillName
     ): JsonResponse
     {
         $user = $this->userSkillService->findWithSkills($userId);
         if (!$user) {
             return $this->setJsonResponse(false, ['Пользователь не найден'], [], 404);
+        }
+        $skill = $this->skillService->findByName($skillName);
+        if (!$skill) {
+            $dto = new SkillRequestDto();
+            $dto->name = $skillName;
+            $skill = $this->skillService->createSkill($dto);
         }
         if (!$this->userSkillService->attachSkillToUser($user, $skill)) {
             return $this->setJsonResponse(false, ['Навык уже прикреплен к пользователю'], [], 200);
         }
-
-        return $this->setJsonResponse(true, [], [
-            'user_id' => $user->getId(),
-            'skill_id' => $skill->getId(),
-            'skill_name' => $skill->getName(),
-            'skill_descr' => $skill->getDescr(),
-        ]);
+        return $this->setJsonResponse(true, [], []);
     }
 
     #[ValidateCsrfToken]
-    #[Route('/detach-skill/{userId}/{skillId}',
+    #[Route('/detach-skill/{userId}/{skillName}',
         name: 'api_user_detach_skill',
-        requirements: ['userId' => '\d+', 'skillId' => '\d+'],
+        requirements: ['userId' => '\d+', 'skillName' => '.+'],
         methods: ['POST'],
         format: 'json')]
     public function detachSkill(
         int $userId,
-        #[MapEntity(mapping: ['skillId' => 'id'])] Skill $skill
+        string $skillName
     ): JsonResponse
     {
         $user = $this->userSkillService->findWithSkills($userId);
         if (!$user) {
             return $this->setJsonResponse(false, ['Пользователь не найден'], [], 404);
         }
-
-        $this->userSkillService->detachSkillFromUser($user, $skill);
-        $data = $this->entityToArray($user);
-        return $this->setJsonResponse(true, [], $data);
+        $this->userSkillService->detachSkillFromUser($user, $skillName);
+        return $this->setJsonResponse(true, [], []);
     }
 
     #[Route('/skills/{id}', name: 'api_user_skills',  requirements: ['id' => '\d+'], methods: ['GET'], format: 'json')]
@@ -133,17 +134,18 @@ class UserController extends BaseController
     }
 
     #[ValidateCsrfToken]
-    #[Route('/delete/{id}', name: 'api_user_delete', methods: ['DELETE'], format: 'json')]
+    #[Route('/delete/{id}', name: 'api_user_delete', methods: ['POST'], format: 'json')]
     public function delete(int $id): JsonResponse
     {
-        $user = $this->userSkillService->findWithSkills($id);
+        $user = $this->userQuestionService->findWithQuestions($id);
         if (!$user) {
             return $this->setJsonResponse(false, ['Пользователь не найден'], [], 404);
         }
-
+        if (!$user->getQuestions()->isEmpty()) {
+            return $this->setJsonResponse(false, ['Нельзя удалить пользователя с вопросами'], [], 400);
+        }
         $this->entityManager->remove($user);
         $this->entityManager->flush();
-
         return $this->setJsonResponse(true, [], []);
     }
 
@@ -157,8 +159,7 @@ class UserController extends BaseController
             'status' => $user->getStatus(),
             'phone' => $user->getPhone(),
             'roles' => $user->getRoles(),
-            'skills' => $user->getSkillsAsArray(),
-            'createdAt' => $user->getCreatedAt()?->format('Y-m-d H:i:s'),
+            'skills' => $user->getSkillsAsArray()
         ];
     }
 }

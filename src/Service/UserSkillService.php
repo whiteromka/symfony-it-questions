@@ -14,18 +14,18 @@ class UserSkillService
         private readonly EntityManagerInterface $entityManager
     ) {}
 
+    public function find(int $id): ?User
+    {
+        return $this->userRepository->find($id);
+    }
+
     /**
      * Найти всех с навыками
      * @return array []
      */
     public function findAllWithSkills(): array
     {
-        return $this->userRepository
-            ->createQueryBuilder('u')
-            ->leftJoin('u.skills', 's')
-            ->addSelect('s')
-            ->getQuery()
-            ->getResult();
+        return $this->userRepository->findAllWithSkills();
     }
 
     /**
@@ -33,14 +33,7 @@ class UserSkillService
      */
     public function findWithSkills(int $id): ?User
     {
-        return $this->userRepository
-            ->createQueryBuilder('u')
-            ->leftJoin('u.skills', 's')
-            ->addSelect('s')
-            ->where('u.id = :id')
-            ->setParameter('id', $id)
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->userRepository->findWithSkills($id);
     }
 
     /** Прикрепить навык к польз-лю */
@@ -56,15 +49,15 @@ class UserSkillService
     }
 
     /** Открепить навык от польз-ля */
-    public function detachSkillFromUser(User $user, Skill $skill): bool
+    public function detachSkillFromUser(User $user, string $skillName): bool
     {
-        if (!$user->getSkills()->contains($skill)) {
-            return true;
+        $skills = $user->getSkills();
+        $skill = $skills->filter(fn($s) => $s->getName() === $skillName)->first();
+        if (!$skill) {
+            return false;
         }
-
         $user->removeSkill($skill);
         $this->entityManager->flush();
-
         return true;
     }
 

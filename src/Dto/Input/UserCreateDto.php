@@ -33,8 +33,8 @@ class UserCreateDto
     public ?string $phone = null;
 
     #[Assert\Type('integer')]
-    #[Assert\Choice([1, 10], message: 'Статус должен быть 1 или 10')]
-    public ?int $status = 10;
+    #[Assert\Choice([1, 0], message: 'Статус должен быть 1 или 0')]
+    public ?int $status = 1;
 
     #[Assert\Type('array')]
     public array $roles = ['ROLE_USER'];
