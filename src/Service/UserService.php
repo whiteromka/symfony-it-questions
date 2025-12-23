@@ -14,9 +14,8 @@ class UserService
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly EntityManagerInterface $entityManager
-    )
-    {}
+        private readonly EntityManagerInterface $em
+    ) {}
 
     /**
      * @return User[]
@@ -46,7 +45,7 @@ class UserService
         return $this->userRepository->findOneBy(['email' => $email]);
     }
 
-    /** Создать нового пользователя */
+    /** Создать нового пользователя (не сохранит в БД!) */
     public function newUser(
         string $email,
         string $name = '',
@@ -69,12 +68,12 @@ class UserService
         return $user;
     }
 
-    /** Создать нового пользователя в БД */
+    /** Создать нового пользователя и сохранит в БД */
     public function createUser(UserCreateDto $dto): ?User
     {
         $user = $this->newUser($dto->email, $dto->name, $dto->lastName, $dto->status, $dto->phone);
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $this->em->persist($user);
+        $this->em->flush();
 
         return $user;
     }
@@ -82,8 +81,8 @@ class UserService
     /** Удалить пользователя */
     public function deleteUser(User $user): bool
     {
-        $this->entityManager->remove($user);
-        $this->entityManager->flush();
+        $this->em->remove($user);
+        $this->em->flush();
         return true;
     }
 }
